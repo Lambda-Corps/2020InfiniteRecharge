@@ -8,6 +8,7 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.InvertType;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -33,8 +34,11 @@ public class DriveTrain extends SubsystemBase {
     m_rightFollower = new TalonSRX(RIGHT_TALON_FOLLOWER);
     m_rightFollower.follow(m_rightLeader);
 
+    // Phoenix Tuner showed left side needs to be inverted
     m_leftLeader  = new TalonSRX(LEFT_TALON_LEADER);
+    m_leftLeader.setInverted(true);
     m_leftFollower = new TalonSRX(LEFT_TALON_FOLLOWER);
+    m_leftFollower.setInverted(InvertType.FollowMaster);
     m_leftFollower.follow(m_leftLeader);
   }
 
