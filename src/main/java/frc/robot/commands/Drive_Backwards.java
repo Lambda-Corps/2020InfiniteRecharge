@@ -9,22 +9,21 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Robot;
 import frc.robot.subsystems.DriveTrain;
 import static frc.robot.Constants.*;
 
-public class DefaultDriveTrainCommand extends CommandBase {
-  // Reference to the constructed drive train from RobotContainer to be 
-  // used to drive our robot
+
+public class Drive_Backwards extends CommandBase {
   private final DriveTrain m_driveTrain;
   private final XboxController m_driverController;
   /**
-   * Creates a new DefaultDriveTrainCommand.
+   * Creates a new Drive_Backwards.
    */
-  public DefaultDriveTrainCommand(DriveTrain driveTrain, XboxController driverController) {
+  public Drive_Backwards(DriveTrain driveTrain, XboxController driverController) {
+    // Use addRequirements() here to declare subsystem dependencies.
     m_driveTrain = driveTrain;
     m_driverController = driverController;
-
-    // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(m_driveTrain);
   }
 
@@ -36,12 +35,10 @@ public class DefaultDriveTrainCommand extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    // Axises are inverted, negate them so positive is forward
     double right = m_driverController.getRawAxis(DRIVER_RIGHT_AXIS); // Right X
     double left  = -m_driverController.getRawAxis(DRIVER_LEFT_AXIS); // Left Y
 
-    m_driveTrain.teleop_drive(left, right);
-    // m_driveTrain.curvature_drive_imp(0.5, 0.5, false);
+    m_driveTrain.teleop_drive(-left, right);
   }
 
   // Called once the command ends or is interrupted.

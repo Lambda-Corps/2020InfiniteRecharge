@@ -43,7 +43,7 @@ public class DriveTrain extends SubsystemBase {
   }
 
   public void teleop_drive(double left, double right){
-    tank_drive_imp(left, right);
+    curvature_drive_imp(left, right, true);
   }
 
   private void tank_drive_imp(double left_speed, double right_speed){

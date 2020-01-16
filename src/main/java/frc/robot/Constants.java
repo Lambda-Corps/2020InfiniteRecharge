@@ -18,7 +18,7 @@ package frc.robot;
 public final class Constants {
     // Operator Interface 
     public static final int DRIVER_REMOTE_PORT = 0;
-    public static final int DRIVER_RIGHT_AXIS = 5;
+    public static final int DRIVER_RIGHT_AXIS = 4;
     public static final int DRIVER_LEFT_AXIS = 1;
     public static final int PARTNER_REMOTE_PORT = 1;
 
