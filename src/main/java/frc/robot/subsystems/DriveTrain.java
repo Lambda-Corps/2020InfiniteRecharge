@@ -46,11 +46,11 @@ public class DriveTrain extends SubsystemBase {
     curvature_drive_imp(left, right, true);
   }
 
-  private void tank_drive_imp(double left_speed, double right_speed){
+  /* private void tank_drive_imp(double left_speed, double right_speed){
     m_leftLeader.set(ControlMode.PercentOutput, left_speed);
     m_rightLeader.set(ControlMode.PercentOutput, right_speed);
   }
-
+  */
   private void curvature_drive_imp(double xSpeed, double zRotation, boolean isQuickTurn) {
 
     xSpeed = MathUtil.clamp(xSpeed, -1.0, 1.0);

@@ -9,6 +9,7 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+import frc.robot.commands.AlignWithVision;
 import frc.robot.commands.DefaultDriveTrainCommand;
 import frc.robot.commands.Drive_Backwards;
 import frc.robot.subsystems.DriveTrain;
@@ -31,6 +32,7 @@ public class RobotContainer {
   // The robot's operator interface functionality goes here
   private final XboxController m_driver_controller = new XboxController(DRIVER_REMOTE_PORT);
   public JoystickButton driver_RB;
+  public JoystickButton driver_A;
 
   /**
    * The container for the robot.  Contains subsystems, OI devices, and commands.
@@ -54,6 +56,8 @@ public class RobotContainer {
   private void configureButtonBindings() {
     driver_RB = new JoystickButton(m_driver_controller, 6);
     driver_RB.whenHeld(new Drive_Backwards(m_drive_train, m_driver_controller));
+    driver_A = new JoystickButton(m_driver_controller, 1);
+    driver_A.whenHeld(new AlignWithVision(m_drive_train, m_vision));
     }
 
 
