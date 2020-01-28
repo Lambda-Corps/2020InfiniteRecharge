@@ -9,6 +9,7 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.InvertType;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -28,16 +29,24 @@ public class DriveTrain extends SubsystemBase {
    */
   public DriveTrain() {
     
-    // TODO -- Finish with phoenix tuner to determine inversion, sensor phase
+    // Finish with phoenix tuner to determine inversion, sensor phase
     // and all the rest of the Bring-Up steps for the Talon
     m_rightLeader = new TalonSRX(RIGHT_TALON_LEADER);
+    m_rightLeader.configFactoryDefault();
+    m_rightLeader.setNeutralMode(NeutralMode.Brake);
     m_rightFollower = new TalonSRX(RIGHT_TALON_FOLLOWER);
+    m_rightFollower.configFactoryDefault();
+    m_rightFollower.setNeutralMode(NeutralMode.Brake);
     m_rightFollower.follow(m_rightLeader);
 
     // Phoenix Tuner showed left side needs to be inverted
     m_leftLeader  = new TalonSRX(LEFT_TALON_LEADER);
+    m_leftLeader.configFactoryDefault();
+    m_leftLeader.setNeutralMode(NeutralMode.Brake);
     m_leftLeader.setInverted(true);
     m_leftFollower = new TalonSRX(LEFT_TALON_FOLLOWER);
+    m_leftFollower.configFactoryDefault();
+    m_leftFollower.setNeutralMode(NeutralMode.Brake);
     m_leftFollower.setInverted(InvertType.FollowMaster);
     m_leftFollower.follow(m_leftLeader);
   }

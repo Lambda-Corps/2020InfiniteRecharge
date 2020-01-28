@@ -18,7 +18,7 @@ public class Vision extends SubsystemBase {
   private final NetworkTable m_limelightTable;
   private double tv, tx, ta;
   private ArrayList<Double> m_targetList;
-  private final int MAX_ENTRIES = 10;
+  private final int MAX_ENTRIES = 50;
 
 
   /**
@@ -40,7 +40,7 @@ public class Vision extends SubsystemBase {
     SmartDashboard.putNumber("tv", tv);
     SmartDashboard.putNumber("ta", ta);
     
-    if (m_targetList.size() == MAX_ENTRIES) {
+    if (m_targetList.size() >= MAX_ENTRIES) {
       m_targetList.remove(0);
     }
     m_targetList.add(ta);
@@ -60,6 +60,6 @@ public class Vision extends SubsystemBase {
   }
 
   public boolean isTargetValid() {
-    return (tv < 1.0); 
+    return (tv == 1.0); 
   }
 }

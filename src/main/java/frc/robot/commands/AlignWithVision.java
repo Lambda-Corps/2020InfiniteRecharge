@@ -17,9 +17,9 @@ public class AlignWithVision extends CommandBase {
   private final Vision m_vision;
 
   // Constants: tune driving and steering control constants
-  private double m_steeringKP = 0.03;
-  private double m_targetArea = 3;
-  private double m_driveKP = 0.26;
+  private double m_steeringKP = 0.055;
+  private double m_targetArea = 2.1;
+  private double m_driveKP = 0.80;
 
   /**
    * Creates a new AlignWithVision.
@@ -30,35 +30,44 @@ public class AlignWithVision extends CommandBase {
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(m_DriveTrain, m_vision);
 
-    SmartDashboard.putNumber("Steering KP", .05);
-    SmartDashboard.putNumber("min TA", 3);
-    SmartDashboard.putNumber("Driving KP", 0.26);
-
+    SmartDashboard.putNumber("Steering KP", 0.055);  // TODO -- Tune KPs on carpet
+    SmartDashboard.putNumber("min TA", 2.1);
+    SmartDashboard.putNumber("Driving KP", 0.80);
   }
 
-  // Called when the command is initially scheduled.
+  // Called when the command is initially scheduled.S
   @Override
   public void initialize() {
     m_steeringKP = SmartDashboard.getNumber("Steering KP", 0.0);
     m_targetArea = SmartDashboard.getNumber("min TA", 0.0);
     m_driveKP = SmartDashboard.getNumber("Driving KP", 0.0);
 
+    SmartDashboard.putNumber("Left", 10000);
+    SmartDashboard.putNumber("Right", 10000);
+
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-  //  double right = m_vision.getTX()*m_steeringKP; // Right Y
-  //  double left  = (m_targetArea-m_vision.getTA())*m_driveKP; // Left X
-    SmartDashboard.putNumber("target area", m_targetArea);
+    double right = m_vision.getTX()*m_steeringKP; // Right Y
+    double left  = (m_targetArea-m_vision.getTA())*m_driveKP; // Left X
+    SmartDashboard.putNumber("target area", m_vision.getTA());
 
+    // m_DriveTrain.teleop_drive(left, right); // Drive until the target is at desired distance
+    SmartDashboard.putNumber("Left", left);
+    SmartDashboard.putNumber("Right", right);
     if (m_vision.isTargetValid()) {
-      
-      //  m_DriveTrain.teleop_drive(left, right); // Drive until the target is at desired distance
+      if (m_vision.getTA() >= m_targetArea) {
+        left = 0;
+        right = 0;
+      }
     } else {
-      m_DriveTrain.teleop_drive(0, 0);
+     left = 0;
+     right = 0;
     }
-    
+
+    m_DriveTrain.teleop_drive(left, right);
   }
 
   // Called once the command ends or is interrupted.
