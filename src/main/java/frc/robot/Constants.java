@@ -23,8 +23,8 @@ public final class Constants {
     public static final int PARTNER_REMOTE_PORT = 1;
 
     // DriveTrain Constants
-    public static final int LEFT_TALON_LEADER    = 4;
-    public static final int LEFT_TALON_FOLLOWER  = 3;
+    public static final int LEFT_TALON_LEADER    = 3;
+    public static final int LEFT_TALON_FOLLOWER  = 4;
     public static final int RIGHT_TALON_LEADER   = 5;
     public static final int RIGHT_TALON_FOLLOWER = 6;
 }
