@@ -24,11 +24,13 @@ public class DriveTrain extends SubsystemBase {
 
   private final TalonSRX m_rightLeader, m_rightFollower;
   private final TalonSRX m_leftLeader, m_leftFollower;
+
+  //private final AHRS navx;
   /**
    * Creates a new DriveTrain.
    */
   public DriveTrain() {
-    
+    //navx = new AHRS();
     // Finish with phoenix tuner to determine inversion, sensor phase
     // and all the rest of the Bring-Up steps for the Talon
     m_rightLeader = new TalonSRX(RIGHT_TALON_LEADER);
@@ -137,5 +139,20 @@ public class DriveTrain extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+  }
+
+  public void stopMotors() {
+    m_leftLeader.set(ControlMode.PercentOutput, 0);
+    m_rightLeader.set(ControlMode.PercentOutput, 0);
+  }
+
+  public boolean drivePositionPID(double setpoint, double tolerance) {
+    m_leftLeader.set(ControlMode.Position, setpoint);
+    m_rightLeader.set(ControlMode.Position, setpoint);
+
+    int leftErr = m_leftLeader.getClosedLoopError();
+    int rightErr = m_rightLeader.getClosedLoopError();
+
+    return (leftErr <= tolerance) && (rightErr <= tolerance);
   }
 }
