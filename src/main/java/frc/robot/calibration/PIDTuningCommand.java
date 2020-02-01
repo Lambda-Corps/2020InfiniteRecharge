@@ -7,8 +7,8 @@
 
 package frc.robot.calibration;
 
-import java.util.function.DoubleSupplier;
-
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -28,11 +28,12 @@ import frc.robot.subsystems.DriveTrain;
  * Dashboard as well for tuning.
  */
 public class PIDTuningCommand extends CommandBase {
-  private double m_kp, m_ki, m_kd, m_kf, m_setpoint, m_tolerance;
   private boolean isDone;
 
-  private final DriveTrain m_dt;
+  double m_setpoint, m_tolerance;
+  private DriveTrain m_dt;
   private final ShuffleboardTab m_myTab;
+  private NetworkTableEntry m_kpEntry, m_kiEntry, m_kdEntry, m_kfEntry, m_spEntry, m_tolEntry, m_status;
   /**
    * Creates a new PIDTuningCommand.
    */
@@ -40,17 +41,24 @@ public class PIDTuningCommand extends CommandBase {
     // add all the Shuffleboard configuration values
     m_myTab = Shuffleboard.getTab("PID Tuning");
 
-    // Setup each configuration value that we'll use from run to run.
-    m_myTab.addNumber("kP", ()-> 0.0 );
-    m_myTab.addNumber("kI", ()-> 0.0 );
-    m_myTab.addNumber("kD", ()-> 0.0 );
-    m_myTab.addNumber("kF", ()-> 0.0 );
-    m_myTab.addNumber("Set Point", ()-> 0.0 );
-    m_myTab.addNumber("Error Tolerance", ()->0.0);
-
     m_dt = dt;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(m_dt);
+  }
+
+  // This constructor exists ONLY for the reason to have it be testable in the Robot Simulator
+  // The Robot Simulator doesn't have
+  public PIDTuningCommand( ) {
+    // add all the Shuffleboard configuration values
+    m_myTab = Shuffleboard.getTab("PID Tuning");
+    m_dt = null;
+
+    m_kpEntry = m_myTab.add("kP", 0).withPosition(1, 3).getEntry();
+    m_kiEntry = m_myTab.add("kI", 0 ).withPosition(2, 3).getEntry();
+    m_kdEntry = m_myTab.add("kD", 0 ).withPosition(3, 3).getEntry();
+    m_kfEntry = m_myTab.add("kF", 0 ).withPosition(0, 3).getEntry();
+    m_spEntry = m_myTab.add("Set Point", 0 ).withPosition(4, 3).getEntry();
+    m_tolEntry = m_myTab.add("Error Tolerance", 0 ).withPosition(5, 3).getEntry();
   }
 
   // Called when the command is initially scheduled.
@@ -58,25 +66,43 @@ public class PIDTuningCommand extends CommandBase {
   public void initialize() {
     // Setup the values for this first run:
     isDone = false;
-    m_kp = m_myTab.add("kP",0).getEntry().getDouble(0.0);
-    m_ki = m_myTab.add("kI",0).getEntry().getDouble(0.0);
-    m_kd = m_myTab.add("kD",0).getEntry().getDouble(0.0);
-    m_kf = m_myTab.add("kF",0).getEntry().getDouble(0.0);
-    m_setpoint = m_myTab.add("Set Point",0).getEntry().getDouble(0.0);
-    m_tolerance = m_myTab.add("Error Tolerance",0).getEntry().getDouble(0.0);
+
+    // Grab the member variables from Shuffleboard for this next run
+    double kp = m_kpEntry.getDouble(0);
+    double ki = m_kiEntry.getDouble(0);
+    double kd = m_kdEntry.getDouble(0);
+    double kf = m_kfEntry.getDouble(0);
+    m_setpoint = m_spEntry.getDouble(0);
+    m_tolerance = m_tolEntry.getDouble(0);
+
+    System.out.println("Values kp: " + kp + " ki: " + ki );
+    // Setup the PID configuration in the Talons
+    if( m_dt != null){
+      m_dt.setPIDValues(kp, ki, kd, kf);
+    }  
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    isDone = m_dt.drivePositionPID(m_setpoint, m_tolerance);
+    // Run the PID control loop on the talon.  It's okay to call this repeatedly.
+    // Constantly setting the setpoint in a position or velocity PID is fine.
+
+    // In the case of PID controls, this call to start the actual PID loop could 
+    // be done in initialize, because calling it once and calling it repeatedly 
+    // without changing the PID or set point values is basically the same thing.
+    if( m_dt != null ){
+      isDone = m_dt.drivePositionPID(m_setpoint, m_tolerance);
+    }
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
     // Shut the motors off by driving in Percent
-    m_dt.stopMotors();
+    if( m_dt != null ){
+      m_dt.stopMotors();
+    }
   }
 
   // Returns true when the command should end.

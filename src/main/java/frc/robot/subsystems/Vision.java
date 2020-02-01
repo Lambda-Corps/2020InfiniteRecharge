@@ -36,9 +36,9 @@ public class Vision extends SubsystemBase {
     tx = m_limelightTable.getEntry("tx").getDouble(0);
     ta = m_limelightTable.getEntry("ta").getDouble(0);
 
-    SmartDashboard.putNumber("tx", tx);
-    SmartDashboard.putNumber("tv", tv);
-    SmartDashboard.putNumber("ta", ta);
+    // SmartDashboard.putNumber("tx", tx);
+    // SmartDashboard.putNumber("tv", tv);
+    // SmartDashboard.putNumber("ta", ta);
     
     if (m_targetList.size() >= MAX_ENTRIES) {
       m_targetList.remove(0);

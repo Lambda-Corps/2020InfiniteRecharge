@@ -9,6 +9,10 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.calibration.PIDTuningCommand;
 import frc.robot.commands.AlignWithVision;
 import frc.robot.commands.DefaultDriveTrainCommand;
 import frc.robot.commands.Drive_Backwards;
@@ -45,6 +49,8 @@ public class RobotContainer {
     // NOTE -- This should not be called until all the subsystems have been instantiated and the 
     // default commands for them have been set.
     configureButtonBindings();
+
+    setupShuffleBoard();
   }
 
   /**
@@ -69,5 +75,24 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
     // An ExampleCommand will run in autonomous
     return null;
+  }
+
+  private void setupShuffleBoard(){
+    // Setup methods for each subset of Shuffleboard needed setup
+
+    setupAutonomousShuffleboard();
+
+    setupPidTuningCommandShuffleboard();
+  }
+
+  private void setupAutonomousShuffleboard(){
+
+  }
+
+  private void setupPidTuningCommandShuffleboard(){
+    // First, assign a local variable the Tab that we are going to use
+    // for pid tuning in Shuffleboard
+    Shuffleboard.getTab("PID Tuning").add(new PIDTuningCommand());
+
   }
 }
