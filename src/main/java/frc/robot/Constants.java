@@ -17,12 +17,17 @@ package frc.robot;
  */
 public final class Constants {
     // Operator Interface 
-    public static final int DRIVER_REMOTE_PORT = 0;
-    public static final int DRIVER_RIGHT_AXIS = 4;
-    public static final int DRIVER_LEFT_AXIS = 1;
-    public static final int PARTNER_REMOTE_PORT = 1;
-
-    // DriveTrain Constants
+    public static final int DRIVER_REMOTE_PORT   = 0;
+    public static final int DRIVER_RIGHT_AXIS    = 4;
+    public static final int DRIVER_LEFT_AXIS     = 1;
+    public static final int PARTNER_REMOTE_PORT  = 1;
+   //Climbing Subsytem
+    public static final int TOP_LIMIT_SWITCH     = 1;
+    public static final int BOTTEM_LIMIT_SWITCH  = 0;
+    public static final int CLIMBER_CHANNEL_A    = 2;
+    public static final int CLIMBER_CHANNEL_B    = 3;
+    // Talons
+    public static final int CLIMBER_MOTOR        = 1;
     public static final int LEFT_TALON_LEADER    = 3;
     public static final int LEFT_TALON_FOLLOWER  = 4;
     public static final int RIGHT_TALON_LEADER   = 5;

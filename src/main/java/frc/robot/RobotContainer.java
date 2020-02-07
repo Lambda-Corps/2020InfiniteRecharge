@@ -10,12 +10,18 @@ package frc.robot;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+// import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+// import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.calibration.PIDTuningCommand;
 import frc.robot.commands.AlignWithVision;
+import frc.robot.commands.ClimbAndLock;
+import frc.robot.commands.ClimberDown;
+import frc.robot.commands.ClimberUp;
 import frc.robot.commands.DefaultDriveTrainCommand;
 import frc.robot.commands.Drive_Backwards;
+import frc.robot.commands.ExtendClimberSolenoid;
+import frc.robot.commands.RetractClimberSolenoid;
+import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.Vision;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -32,7 +38,7 @@ public class RobotContainer {
   // The robot's subsystems are defined here
   private final DriveTrain m_drive_train = new DriveTrain();
   private final Vision m_vision = new Vision();
-  
+  private final Climber m_climber = new Climber();
   // The robot's operator interface functionality goes here
   private final XboxController m_driver_controller = new XboxController(DRIVER_REMOTE_PORT);
   public JoystickButton driver_RB;
@@ -83,6 +89,8 @@ public class RobotContainer {
     setupAutonomousShuffleboard();
 
     setupPidTuningCommandShuffleboard();
+
+    setupClimberShuffleBoard();
   }
 
   private void setupAutonomousShuffleboard(){
@@ -94,5 +102,13 @@ public class RobotContainer {
     // for pid tuning in Shuffleboard
     Shuffleboard.getTab("PID Tuning").add(new PIDTuningCommand());
 
+  }
+
+  private void setupClimberShuffleBoard(){
+    Shuffleboard.getTab("Climber").add("up",new ClimberUp(m_climber, m_driver_controller));
+    Shuffleboard.getTab("Climber").add("down",new ClimberDown(m_climber,m_driver_controller));
+    Shuffleboard.getTab("Climber").add("Lift up and fire Solenoid",new ClimbAndLock(m_climber,m_driver_controller));
+    Shuffleboard.getTab("Climber").add("ExtendSolenoid",new ExtendClimberSolenoid(m_climber,m_driver_controller));
+    Shuffleboard.getTab("Climber").add("RetractSolnoid",new RetractClimberSolenoid(m_climber,m_driver_controller));
   }
 }
