@@ -8,18 +8,14 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import edu.wpi.first.wpilibj.DoubleSolenoid;
-import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.subsystems.Climber;
 public class RetractClimberSolenoid extends CommandBase {
   final Climber m_climber;
-  final XboxController m_conntroler;
   /**
    * Creates a new RetractClimberSolenoid.
    */
-  public RetractClimberSolenoid(Climber climber, XboxController driverController) {
+  public RetractClimberSolenoid(Climber climber) {
     m_climber = climber;
-    m_conntroler = driverController;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(climber);
   }

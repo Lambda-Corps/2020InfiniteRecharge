@@ -27,9 +27,13 @@ public final class Constants {
     public static final int CLIMBER_CHANNEL_A    = 2;
     public static final int CLIMBER_CHANNEL_B    = 3;
     // Talons
-    public static final int CLIMBER_MOTOR        = 1;
-    public static final int LEFT_TALON_LEADER    = 3;
-    public static final int LEFT_TALON_FOLLOWER  = 4;
-    public static final int RIGHT_TALON_LEADER   = 5;
-    public static final int RIGHT_TALON_FOLLOWER = 6;
+    public static final int CLIMBER_MOTOR          = 1;
+    public static final int LEFT_TALON_LEADER      = 3;
+    public static final int LEFT_TALON_FOLLOWER    = 4;
+    public static final int RIGHT_TALON_LEADER     = 5;
+    public static final int RIGHT_TALON_FOLLOWER   = 6;
+    public static final int COLOR_WHEEL_TALON      = 7; // this is spinning the Motor
+    public static final int INSIDE_INTAKE          = 10;   //This Talon controls the motor 
+    public static final int OUTSIDE_INTAKE         = 11;       // This Motor 
+    public static final int OUTSIDE_INTAKE_INDEXER = 12; //INTAKE THAT TAKES THE POWER CELLS UP TO THE SHOOTER
 }

@@ -8,7 +8,6 @@
 package frc.robot.calibration;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -33,7 +32,7 @@ public class PIDTuningCommand extends CommandBase {
   double m_setpoint, m_tolerance;
   private DriveTrain m_dt;
   private final ShuffleboardTab m_myTab;
-  private NetworkTableEntry m_kpEntry, m_kiEntry, m_kdEntry, m_kfEntry, m_spEntry, m_tolEntry, m_status;
+  private NetworkTableEntry m_kpEntry, m_kiEntry, m_kdEntry, m_kfEntry, m_spEntry, m_tolEntry;
   /**
    * Creates a new PIDTuningCommand.
    */
@@ -75,10 +74,10 @@ public class PIDTuningCommand extends CommandBase {
     m_setpoint = m_spEntry.getDouble(0);
     m_tolerance = m_tolEntry.getDouble(0);
 
-    System.out.println("Values kp: " + kp + " ki: " + ki );
+    System.out.println("Values kp: " + kp + " ki: " + ki + " kd: " + kd + " kf: " + kf);
     // Setup the PID configuration in the Talons
     if( m_dt != null){
-      m_dt.setPIDValues(kp, ki, kd, kf);
+      //m_dt.setPIDValues(kp, ki, kd, kf);
     }  
   }
 
