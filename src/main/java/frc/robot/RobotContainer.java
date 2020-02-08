@@ -113,7 +113,7 @@ public class RobotContainer {
   }
 
   private void setupClimberShuffleBoard(){
-    Shuffleboard.getTab("Climber").add("up",new ClimberUp(m_climber, m_driver_controller));
+    Shuffleboard.getTab("Climber").add("up",new ClimberUp(m_climber));
     Shuffleboard.getTab("Climber").add("down",new ClimberDown(m_climber));
     Shuffleboard.getTab("Climber").add("Lift up and fire Solenoid",new ClimbAndLock(m_climber));
     Shuffleboard.getTab("Climber").add("ExtendSolenoid",new ExtendClimberSolenoid(m_climber));

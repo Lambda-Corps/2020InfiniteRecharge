@@ -7,22 +7,17 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Climber;
 
 public class ClimberUp extends CommandBase {
-  final Climber m_climber;
-  final XboxController m_conntroler;
-  private double m_speed;
-  private boolean m_isdone;
-  //private Solenoid m_solenoid;
+  private final Climber m_climber;
+  
   /**
    * Creates a new ClimberUp.
    */
-  public ClimberUp(Climber climber, XboxController driverController) {
+  public ClimberUp(Climber climber) {
     m_climber = climber;
-    m_conntroler = driverController;
 
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(climber);
@@ -36,21 +31,19 @@ public class ClimberUp extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_climber.driveup(m_speed);
-    m_isdone = m_climber.isclimberdone();
-    //boolean m_Solenoid = false;
+    m_climber.raise();
 
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(final boolean interrupted) {
-    m_climber.stopmotor();
+    m_climber.stopMotor();
     
   }
 
   @Override
   public boolean isFinished(){
-    return m_isdone;
+    return m_climber.isUpperLimitReached();
   }
 }

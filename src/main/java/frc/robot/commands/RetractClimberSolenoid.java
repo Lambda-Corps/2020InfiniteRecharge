@@ -28,7 +28,7 @@ public class RetractClimberSolenoid extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-  m_climber.solenoidreverse();
+  m_climber.retractLockingPistons();
   }
 
   // Called once the command ends or is interrupted.

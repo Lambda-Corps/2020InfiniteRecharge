@@ -16,105 +16,124 @@ import static frc.robot.Constants.TOP_LIMIT_SWITCH;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
-import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-// import java.util.Set;
-
-// import static edu.wpi.first.wpilibj.DoubleSolenoid.Value.*;
-
 public class Climber extends SubsystemBase {
-  // Values figured out from tuning
-  private final double CLIMBER_UP_SPEED = 1.0;
-  private final double CLIMBER_DOWN_SPEED = 1.0;
-  public final DoubleSolenoid m_solenoid;
-  public final DigitalInput m_TopSwitch;
-  public final DigitalInput m_BottemSwitch;
-  public final TalonSRX m_LifterMotor;
-  NetworkTableEntry m_downspeed, m_upspeed;
+  // Settings
+  private final double RAISE_SPEED = 1.0;
+  private final double LOWER_SPEED = 1.0;
 
+  // Components of the climber.
+  private final DoubleSolenoid m_solenoid;
+  private final DigitalInput m_toplimitswitch;
+  private final DigitalInput m_bottomlimitswitch;
+  private final TalonSRX m_motor;
+
+  // Working variables.
+  private boolean emergencyOff = false;
+
+  /**
+   * Represents the climber of Team 1895's robot. It handles the raising,
+   * lowering, and locking of the elevator to allow climbing on the power switch
+   * at the end of a match.
+   */
   public Climber() {
-    m_TopSwitch = new DigitalInput(TOP_LIMIT_SWITCH);
-    m_BottemSwitch = new DigitalInput(BOTTEM_LIMIT_SWITCH);
-    m_LifterMotor = new TalonSRX(CLIMBER_MOTOR);
-    m_solenoid = new DoubleSolenoid(CLIMBER_CHANNEL_A, CLIMBER_CHANNEL_B);
+    this.m_toplimitswitch = new DigitalInput(TOP_LIMIT_SWITCH);
+    this.m_bottomlimitswitch = new DigitalInput(BOTTEM_LIMIT_SWITCH);
+    this.m_motor = new TalonSRX(CLIMBER_MOTOR);
+    this.m_solenoid = new DoubleSolenoid(CLIMBER_CHANNEL_A, CLIMBER_CHANNEL_B);
 
-    m_LifterMotor.setInverted(true);
-    Shuffleboard.getTab("Climber").add("top switch", m_TopSwitch);
-    Shuffleboard.getTab("Climber").add("bottom switch", m_BottemSwitch);
+    this.m_motor.setInverted(true); // Positive Voltage = Climber Raise
+
+    Shuffleboard.getTab("Climber").add("top switch", m_toplimitswitch);
+    Shuffleboard.getTab("Climber").add("bottom switch", m_bottomlimitswitch);
     Shuffleboard.getTab("Climber").add("Subsystem", this);
     Shuffleboard.getTab("Climber").add("Solenoid", m_solenoid);
-    m_downspeed = Shuffleboard.getTab("Climber").add("downspeed", -1.0).getEntry();
-    m_upspeed = Shuffleboard.getTab("Climber").add("upspeed", 1.0).getEntry();
-
   }
 
-  public boolean isclimberdonedown() {
-    boolean ret = false;
-    if (m_BottemSwitch.get()) {
-      ret = true;
+  /**
+   * Checks if the climber is at its lowest position.
+   * 
+   * @return A boolean indicating if the climber is at its lowest position.
+   */
+  public boolean isLowerLimitReached() {
+    return m_bottomlimitswitch.get();
+  }
 
+  /**
+   * Checks if the climber is at its highest position.
+   * 
+   * @return A boolean indicating if the climber is at its highest position.
+   */
+  public boolean isUpperLimitReached() {
+    return m_toplimitswitch.get();
+  }
+
+  /**
+   * Commands the climber to start raising. Will refuse and stop the motor if the
+   * climber is at its upper limit.
+   */
+  public void raise() {
+    if (!this.isUpperLimitReached()) {
+      this.setMotorSpeed(RAISE_SPEED);
+    } else {
+      this.setMotorSpeed(0);
     }
-    return ret;
   }
 
-  public boolean isclimberdone() {
-    boolean ret = false;
-
-    if (m_TopSwitch.get()) {
-      ret = true;
+  /**
+   * Commands the climber to start lowering. Will refuse and stop the motor if the
+   * climber is at its lower limit.
+   */
+  public void lower() {
+    if (!this.isLowerLimitReached()) {
+      this.setMotorSpeed(LOWER_SPEED);
+    } else {
+      this.setMotorSpeed(0);
     }
-    return ret;
-
   }
 
-  public void driveup(double speed) {
-    
-    speed = CLIMBER_UP_SPEED;
+  /**
+   * Internal method for setting the speed of the motor. Will ensure the locking
+   * pistons are retracted as they will destroy the mechanism if they are extended
+   * while the motor is powered.
+   * 
+   * @param speed A number between -1.0 and 1.0 indicating the speed. A negative
+   *              number will lower the climber, and positive number will raise
+   *              the climber, and 0 will stop the motor.
+   */
+  private void setMotorSpeed(double speed) {
+    this.retractLockingPistons(); // Never allow the locking pistons to be extended while motor is moving.
 
-    if (m_TopSwitch.get()) {
-      speed = 0;
-    }
-    m_LifterMotor.set(ControlMode.PercentOutput, speed);
-
+    this.m_motor.set(ControlMode.PercentOutput, speed);
   }
 
-  public void stopmotor() {
-    m_LifterMotor.set(ControlMode.PercentOutput, 0);
+  public void stopMotor() {
+    this.m_motor.set(ControlMode.PercentOutput, 0);
   }
 
-  public void solenoidforward() {
-    m_solenoid.set(DoubleSolenoid.Value.kForward);
+  /**
+   * Commands the locking pistons to extend. Will stop the motor as extending the
+   * locking pistons while the motor is running will destroy the climber.
+   */
+  public void extendLockingPistons() {
+    this.stopMotor(); // Never allow the motor to be running while locking pistons are extended.
+
+    this.m_solenoid.set(DoubleSolenoid.Value.kForward);
   }
 
-  public void solenoidreverse() {
-    m_solenoid.set(DoubleSolenoid.Value.kReverse);
+  /**
+   * Commands the locking pistons to retract, allowing the climber to move freely.
+   */
+  public void retractLockingPistons() {
+    this.m_solenoid.set(DoubleSolenoid.Value.kReverse);
   }
 
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
-  }
-
-  public void drivedown() {
-    double speed = CLIMBER_DOWN_SPEED;
-
-    if (m_BottemSwitch.get()) {
-      speed = 0;
-    }
-    m_LifterMotor.set(ControlMode.PercentOutput, speed);
-  }
-
-  public void toggleSolenoid() {
-    Value m_value = m_solenoid.get();
-    if (m_value == Value.kForward) {
-      m_solenoid.set(DoubleSolenoid.Value.kReverse);
-    } else {
-      m_solenoid.set(DoubleSolenoid.Value.kForward);
-    }
   }
 }

@@ -12,8 +12,7 @@ import frc.robot.subsystems.Climber;
 
 
 public class ClimberDown extends CommandBase {
-  final Climber m_climber;
-  private boolean m_isdonedown;
+  private final Climber m_climber;
   //private boolean solenoid;
   
   public ClimberDown (Climber climber) {
@@ -30,20 +29,19 @@ public class ClimberDown extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_climber.drivedown();
-    m_isdonedown = m_climber.isclimberdonedown();
+    m_climber.lower();
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_climber.stopmotor();
+    m_climber.stopMotor();
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return m_isdonedown;
+    return m_climber.isLowerLimitReached();
   }
 }
 
