@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpiutil.math.MathUtil;
+import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 
 import static frc.robot.Constants.*;
 public class DriveTrain extends SubsystemBase {
@@ -24,10 +25,9 @@ public class DriveTrain extends SubsystemBase {
   private double m_quickStopAccumulator;
   private double m_deadband = .1; // TODO, tune this deadband to actually work with robot
 
-  private DoubleSolenoid m_gearbox;
-
   private final TalonSRX m_rightLeader, m_rightFollower;
   private final TalonSRX m_leftLeader, m_leftFollower;
+  private final DoubleSolenoid m_gearPower;
 
   private double m_LeftTalonModifier;
   private double m_rightTalonModifier;
@@ -61,15 +61,14 @@ public class DriveTrain extends SubsystemBase {
     m_leftFollower.setInverted(InvertType.FollowMaster);
     m_leftFollower.follow(m_leftLeader);
 
-    m_gearbox = new DoubleSolenoid(GEARBOX_SOLENOID_A, GEARBOX_SOLENOID_B);
-
-    // Talon Speed Modifiers
-    m_LeftTalonModifier = SmartDashboard.getNumber("Decrese Right Speed by", 0);
-    m_rightTalonModifier = SmartDashboard.getNumber("Decrese Left Speed by", 0);
+    m_gearPower = new DoubleSolenoid(0, 1);
+    //Intialize on high gear
+    m_gearPower.set(Value.kReverse);
   }
 
   public void teleop_drive(double left, double right){
     curvature_drive_imp(left, right, true);
+    //autoShiftGears();
   }
 
   /*public void tank_drive_imp(double left_speed, double right_speed){
@@ -154,7 +153,8 @@ public class DriveTrain extends SubsystemBase {
 
   @Override
   public void periodic() {
-    
+    SmartDashboard.putNumber("Left Velocity", m_leftLeader.getSelectedSensorVelocity());
+    SmartDashboard.putNumber("Right Velocity", m_rightLeader.getSelectedSensorVelocity());
   }
 
   public void stopMotors() {
@@ -191,5 +191,40 @@ public class DriveTrain extends SubsystemBase {
 
   public double getLeftTalonSpeed(){
     return m_leftLeader.getSelectedSensorVelocity();
+  }
+
+  public void setLowGear(){
+    m_gearPower.set(DoubleSolenoid.Value.kForward);
+  }
+
+  public void setHighGear(){
+    m_gearPower.set(DoubleSolenoid.Value.kReverse);
+  }
+
+  public void autoShiftGears(){
+
+    boolean lowGear = false;
+    boolean highGear = false;
+    int leftSpeed = m_leftLeader.getSelectedSensorVelocity();
+    int rightSpeed = m_rightLeader.getSelectedSensorVelocity();
+    DoubleSolenoid.Value solenoidPosition = m_gearPower.get();
+    double upShiftSpeed = 1600;
+    double downShiftSpeed = 1200;
+    double currentSpeed = Math.max(Math.abs(leftSpeed), Math.abs(rightSpeed));
+
+    if((currentSpeed > upShiftSpeed) && (solenoidPosition == Value.kReverse)){
+      //High to Low
+      setLowGear();
+      lowGear = true;
+    }
+    else if((currentSpeed < downShiftSpeed) && (solenoidPosition == Value.kForward)){
+      //Low to High
+      setHighGear();
+      lowGear = false;
+    }
+
+    SmartDashboard.putBoolean("Low Gear", lowGear);
+    SmartDashboard.putBoolean("High Gear", highGear);
+    SmartDashboard.putNumber("Current Speed", currentSpeed);
   }
 }

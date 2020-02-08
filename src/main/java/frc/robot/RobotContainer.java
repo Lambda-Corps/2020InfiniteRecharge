@@ -119,4 +119,12 @@ public class RobotContainer {
     Shuffleboard.getTab("Climber").add("ExtendSolenoid",new ExtendClimberSolenoid(m_climber));
     Shuffleboard.getTab("Climber").add("RetractSolnoid",new RetractClimberSolenoid(m_climber));
   }
+
+  public void setLowGear(){
+    m_drive_train.setLowGear();
+  }
+
+  public void setHighGear(){
+    m_drive_train.setHighGear();
+  }
 }
