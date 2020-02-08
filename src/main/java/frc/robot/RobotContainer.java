@@ -10,8 +10,8 @@ package frc.robot;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-// import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-// import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+//import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+//import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.calibration.PIDTuningCommand;
 import frc.robot.commands.AlignWithVision;
 import frc.robot.commands.ClimbAndLock;
@@ -22,6 +22,7 @@ import frc.robot.commands.Drive_Backwards;
 import frc.robot.commands.ExtendClimberSolenoid;
 import frc.robot.commands.RetractClimberSolenoid;
 import frc.robot.subsystems.Climber;
+import frc.robot.commands.EditTalonSpeeds;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.Vision;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -43,6 +44,7 @@ public class RobotContainer {
   private final XboxController m_driver_controller = new XboxController(DRIVER_REMOTE_PORT);
   public JoystickButton driver_RB;
   public JoystickButton driver_A;
+  public JoystickButton driver_X;
 
   /**
    * The container for the robot.  Contains subsystems, OI devices, and commands.
@@ -70,6 +72,8 @@ public class RobotContainer {
     driver_RB.whenHeld(new Drive_Backwards(m_drive_train, m_driver_controller));
     driver_A = new JoystickButton(m_driver_controller, 1);
     driver_A.whenHeld(new AlignWithVision(m_drive_train, m_vision));
+    driver_X = new JoystickButton(m_driver_controller, 3);
+    driver_X.whenHeld(new EditTalonSpeeds(m_drive_train));
     }
 
 
@@ -91,6 +95,7 @@ public class RobotContainer {
     setupPidTuningCommandShuffleboard();
 
     setupClimberShuffleBoard();
+    setUpTalonSpeedCommand();
   }
 
   private void setupAutonomousShuffleboard(){
@@ -101,7 +106,10 @@ public class RobotContainer {
     // First, assign a local variable the Tab that we are going to use
     // for pid tuning in Shuffleboard
     Shuffleboard.getTab("PID Tuning").add(new PIDTuningCommand());
+  }
 
+  private void setUpTalonSpeedCommand(){
+    Shuffleboard.getTab("Talon Tuning").add(new EditTalonSpeeds(m_drive_train));
   }
 
   private void setupClimberShuffleBoard(){

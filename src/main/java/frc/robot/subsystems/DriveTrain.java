@@ -12,6 +12,8 @@ import com.ctre.phoenix.motorcontrol.InvertType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
+import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpiutil.math.MathUtil;
 
@@ -22,8 +24,13 @@ public class DriveTrain extends SubsystemBase {
   private double m_quickStopAccumulator;
   private double m_deadband = .1; // TODO, tune this deadband to actually work with robot
 
+  private DoubleSolenoid m_gearbox;
+
   private final TalonSRX m_rightLeader, m_rightFollower;
   private final TalonSRX m_leftLeader, m_leftFollower;
+
+  private double m_LeftTalonModifier;
+  private double m_rightTalonModifier;
 
   //private final AHRS navx;
   /**
@@ -36,6 +43,7 @@ public class DriveTrain extends SubsystemBase {
     m_rightLeader = new TalonSRX(RIGHT_TALON_LEADER);
     m_rightLeader.configFactoryDefault();
     m_rightLeader.setNeutralMode(NeutralMode.Brake);
+    m_rightLeader.setSensorPhase(true);
     m_rightFollower = new TalonSRX(RIGHT_TALON_FOLLOWER);
     m_rightFollower.configFactoryDefault();
     m_rightFollower.setNeutralMode(NeutralMode.Brake);
@@ -46,22 +54,30 @@ public class DriveTrain extends SubsystemBase {
     m_leftLeader.configFactoryDefault();
     m_leftLeader.setNeutralMode(NeutralMode.Brake);
     m_leftLeader.setInverted(true);
+    m_leftLeader.setSensorPhase(true);
     m_leftFollower = new TalonSRX(LEFT_TALON_FOLLOWER);
     m_leftFollower.configFactoryDefault();
     m_leftFollower.setNeutralMode(NeutralMode.Brake);
     m_leftFollower.setInverted(InvertType.FollowMaster);
     m_leftFollower.follow(m_leftLeader);
+
+    m_gearbox = new DoubleSolenoid(GEARBOX_SOLENOID_A, GEARBOX_SOLENOID_B);
+
+    // Talon Speed Modifiers
+    m_LeftTalonModifier = SmartDashboard.getNumber("Decrese Right Speed by", 0);
+    m_rightTalonModifier = SmartDashboard.getNumber("Decrese Left Speed by", 0);
   }
 
   public void teleop_drive(double left, double right){
     curvature_drive_imp(left, right, true);
   }
 
-  /* private void tank_drive_imp(double left_speed, double right_speed){
+  /*public void tank_drive_imp(double left_speed, double right_speed){
     m_leftLeader.set(ControlMode.PercentOutput, left_speed);
     m_rightLeader.set(ControlMode.PercentOutput, right_speed);
   }
   */
+  
   private void curvature_drive_imp(double xSpeed, double zRotation, boolean isQuickTurn) {
 
     xSpeed = MathUtil.clamp(xSpeed, -1.0, 1.0);
@@ -120,7 +136,7 @@ public class DriveTrain extends SubsystemBase {
       rightMotorOutput /= maxMagnitude;
     }
 
-    m_leftLeader.set(ControlMode.PercentOutput, leftMotorOutput);
+    m_leftLeader.set(ControlMode.PercentOutput, leftMotorOutput*.99);
     m_rightLeader.set(ControlMode.PercentOutput, rightMotorOutput);
   }
 
@@ -138,7 +154,7 @@ public class DriveTrain extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
+    
   }
 
   public void stopMotors() {
@@ -154,5 +170,26 @@ public class DriveTrain extends SubsystemBase {
     int rightErr = m_rightLeader.getClosedLoopError();
 
     return (leftErr <= tolerance) && (rightErr <= tolerance);
+  }
+
+  public void setEncodersToZero(){  // Set the left and right encoders to 0
+    m_leftLeader.setSelectedSensorPosition(0);
+    m_rightLeader.setSelectedSensorPosition(0);
+  }
+
+  public double getLeftEncoderValue(){  // Get the value of the left encoder
+    return m_leftLeader.getSelectedSensorPosition();
+  }
+
+  public double getRightEncoderVlaue(){  // Get the right value of the right encoder
+    return m_rightLeader.getSelectedSensorPosition();
+  }
+
+  public double getRightTalonSpeed(){
+    return m_rightLeader.getSelectedSensorVelocity();
+  }
+
+  public double getLeftTalonSpeed(){
+    return m_leftLeader.getSelectedSensorVelocity();
   }
 }

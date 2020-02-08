@@ -26,6 +26,11 @@ public final class Constants {
     public static final int BOTTEM_LIMIT_SWITCH  = 0;
     public static final int CLIMBER_CHANNEL_A    = 2;
     public static final int CLIMBER_CHANNEL_B    = 3;
+    
+    // Solenoids
+    public static final int GEARBOX_SOLENOID_A = 0;
+    public static final int GEARBOX_SOLENOID_B = 1;
+
     // Talons
     public static final int CLIMBER_MOTOR          = 1;
     public static final int LEFT_TALON_LEADER      = 3;
