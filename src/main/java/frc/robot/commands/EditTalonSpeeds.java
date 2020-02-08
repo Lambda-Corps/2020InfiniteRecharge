@@ -30,7 +30,7 @@ public class EditTalonSpeeds extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_driveTrain.setEncodersToZero();
+    m_driveTrain.reset_drivetrain_encoders();
     m_cycleCounter = (int) SmartDashboard.getNumber("Cycles to run", 0);
     
   }
@@ -50,7 +50,7 @@ public class EditTalonSpeeds extends CommandBase {
   public void end(boolean interrupted) {
     m_driveTrain.stopMotors();
     SmartDashboard.putNumber("Left Encoder Value", m_driveTrain.getLeftEncoderValue());
-    SmartDashboard.putNumber("Right Encoder Value", m_driveTrain.getRightEncoderVlaue());
+    SmartDashboard.putNumber("Right Encoder Value", m_driveTrain.getRightEncoderValue());
   }
 
   // Returns true when the command should end.
