@@ -18,6 +18,7 @@ import frc.robot.commands.ClimbAndLock;
 import frc.robot.commands.ClimberDown;
 import frc.robot.commands.ClimberUp;
 import frc.robot.commands.DefaultDriveTrainCommand;
+import frc.robot.commands.DriveMM;
 import frc.robot.commands.Drive_Backwards;
 import frc.robot.commands.ExtendClimberSolenoid;
 import frc.robot.commands.RetractClimberSolenoid;
@@ -96,6 +97,7 @@ public class RobotContainer {
 
     setupClimberShuffleBoard();
     setUpTalonSpeedCommand();
+    setupDriveMMShuffleboard();
   }
 
   private void setupAutonomousShuffleboard(){
@@ -118,5 +120,11 @@ public class RobotContainer {
     Shuffleboard.getTab("Climber").add("Lift up and fire Solenoid",new ClimbAndLock(m_climber));
     Shuffleboard.getTab("Climber").add("ExtendSolenoid",new ExtendClimberSolenoid(m_climber));
     Shuffleboard.getTab("Climber").add("RetractSolnoid",new RetractClimberSolenoid(m_climber));
+  }
+  private void setupDriveMMShuffleboard(){
+    // First, assign a local variable the Tab that we are going to use
+    // for pid tuning in Shuffleboard
+    Shuffleboard.getTab("Drive MM Testing").add(new DriveMM(m_drive_train, 0)).withPosition(0, 2);
+
   }
 }

@@ -31,7 +31,6 @@ public final class Constants {
     public static final int GEARBOX_SOLENOID_A = 0;
     public static final int GEARBOX_SOLENOID_B = 1;
 
-    // Talons
     public static final int CLIMBER_MOTOR          = 1;
     public static final int LEFT_TALON_LEADER      = 3;
     public static final int LEFT_TALON_FOLLOWER    = 4;
@@ -45,4 +44,6 @@ public final class Constants {
     // DriveTrain Configuration Constants
     public static final double  DT_OPENLOOP_RAMP_RATE  = .3;
     public static final int     DT_CONTINUOUS_CURRENT  = 20;
+    public static final double OPEN_LOOP_PEAK_OUTPUT_F = 1;
+    public static final double OPEN_LOOP_PEAK_OUTPUT_B = -1;
 }
