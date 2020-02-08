@@ -14,6 +14,7 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpiutil.math.MathUtil;
@@ -40,6 +41,9 @@ public class DriveTrain extends SubsystemBase {
   private static double m_tolerance = 10;
   private DriveMM m_driveMM;
   private DoubleSolenoid m_gearbox;
+
+  private boolean m_IsLowGear;
+
   private double m_LeftTalonModifier;
   private double m_rightTalonModifier;
   //private final AHRS navx;
@@ -213,6 +217,8 @@ public class DriveTrain extends SubsystemBase {
 
   @Override
   public void periodic() {
+    SmartDashboard.putNumber("Left Velocity", m_leftLeader.getSelectedSensorVelocity());
+    SmartDashboard.putNumber("Right Velocity", m_rightLeader.getSelectedSensorVelocity());
     // This method will be called once per scheduler run
   }
 
@@ -273,5 +279,35 @@ public class DriveTrain extends SubsystemBase {
 
   public void motionMagicDrive(double m_target_position) {
     
+  }
+
+  public void setLowGear(){
+    m_gearbox.set(DoubleSolenoid.Value.kReverse);
+  }
+
+  public void setHighGear(){
+    m_gearbox.set(DoubleSolenoid.Value.kForward);
+  }
+
+  public void autoShiftGears(){
+
+    int leftSpeed = m_leftLeader.getSelectedSensorVelocity();
+    int rightSpeed = m_rightLeader.getSelectedSensorVelocity();
+    DoubleSolenoid.Value solenoidPosition = m_gearbox.get();
+    double currentSpeed = Math.max(Math.abs(leftSpeed), Math.abs(rightSpeed));
+
+    if((currentSpeed > UP_SHIFT_SPEED) && (solenoidPosition == Value.kForward)){
+      //Low to High
+      setLowGear();
+      m_IsLowGear = false;
+    }
+    else if((currentSpeed < DOWN_SHIFT_SPEED) && (solenoidPosition == Value.kReverse)){
+      //High to Low
+      setHighGear();
+      m_IsLowGear = true;
+    }
+
+    SmartDashboard.putBoolean("Low Gear", m_IsLowGear);
+    SmartDashboard.putNumber("Current Speed", currentSpeed);
   }
 }

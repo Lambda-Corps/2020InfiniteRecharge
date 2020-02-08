@@ -46,4 +46,7 @@ public final class Constants {
     public static final int     DT_CONTINUOUS_CURRENT  = 20;
     public static final double OPEN_LOOP_PEAK_OUTPUT_F = 1;
     public static final double OPEN_LOOP_PEAK_OUTPUT_B = -1;
+
+    public static final int     UP_SHIFT_SPEED = 0;
+    public static final int     DOWN_SHIFT_SPEED = 0;
 }
