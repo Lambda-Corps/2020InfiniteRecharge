@@ -220,7 +220,7 @@ public class DriveTrain extends SubsystemBase {
     boolean highGear = false;
     int leftSpeed = m_leftLeader.getSelectedSensorVelocity();
     int rightSpeed = m_rightLeader.getSelectedSensorVelocity();
-    DoubleSolenoid.Value solenoidPosition = m_gearPower.get();
+    DoubleSolenoid.Value solenoidPosition = m_gearbox.get();
     double upShiftSpeed = 1600;
     double downShiftSpeed = 1200;
     double currentSpeed = Math.max(Math.abs(leftSpeed), Math.abs(rightSpeed));
