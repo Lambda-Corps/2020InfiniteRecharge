@@ -148,7 +148,7 @@ public class DriveTrain extends SubsystemBase {
     }
 
     m_leftLeader.set(ControlMode.PercentOutput, leftMotorOutput);
-    m_rightLeader.set(ControlMode.PercentOutput, rightMotorOutput d);
+    m_rightLeader.set(ControlMode.PercentOutput, rightMotorOutput);
   }
 
   private double applyDeadband(double value, double deadband) {
