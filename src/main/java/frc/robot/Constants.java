@@ -41,4 +41,8 @@ public final class Constants {
     public static final int INSIDE_INTAKE          = 10;   //This Talon controls the motor 
     public static final int OUTSIDE_INTAKE         = 11;       // This Motor 
     public static final int OUTSIDE_INTAKE_INDEXER = 12; //INTAKE THAT TAKES THE POWER CELLS UP TO THE SHOOTER
+
+    // DriveTrain Configuration Constants
+    public static final double  DT_OPENLOOP_RAMP_RATE  = .3;
+    public static final int     DT_CONTINUOUS_CURRENT  = 20;
 }

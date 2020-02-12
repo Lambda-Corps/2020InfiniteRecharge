@@ -61,6 +61,17 @@ public class DriveTrain extends SubsystemBase {
     m_leftFollower.setInverted(InvertType.FollowMaster);
     m_leftFollower.follow(m_leftLeader);
 
+    // Setup the power metering for the robot
+    m_leftLeader.configOpenloopRamp(DT_OPENLOOP_RAMP_RATE);
+    m_leftFollower.configOpenloopRamp(DT_OPENLOOP_RAMP_RATE);
+    m_rightLeader.configOpenloopRamp(DT_OPENLOOP_RAMP_RATE);
+    m_rightFollower.configOpenloopRamp(DT_OPENLOOP_RAMP_RATE);
+    
+    m_leftLeader.configContinuousCurrentLimit(DT_CONTINUOUS_CURRENT);
+    m_rightLeader.configContinuousCurrentLimit(DT_CONTINUOUS_CURRENT);
+    m_leftFollower.configContinuousCurrentLimit(DT_CONTINUOUS_CURRENT);
+    m_rightFollower.configContinuousCurrentLimit(DT_CONTINUOUS_CURRENT);
+
     m_gearbox = new DoubleSolenoid(GEARBOX_SOLENOID_A, GEARBOX_SOLENOID_B);
 
     // Talon Speed Modifiers
@@ -136,8 +147,8 @@ public class DriveTrain extends SubsystemBase {
       rightMotorOutput /= maxMagnitude;
     }
 
-    m_leftLeader.set(ControlMode.PercentOutput, leftMotorOutput*.99);
-    m_rightLeader.set(ControlMode.PercentOutput, rightMotorOutput);
+    m_leftLeader.set(ControlMode.PercentOutput, leftMotorOutput);
+    m_rightLeader.set(ControlMode.PercentOutput, rightMotorOutput d);
   }
 
   private double applyDeadband(double value, double deadband) {
@@ -154,7 +165,7 @@ public class DriveTrain extends SubsystemBase {
 
   @Override
   public void periodic() {
-    
+ 
   }
 
   public void stopMotors() {
