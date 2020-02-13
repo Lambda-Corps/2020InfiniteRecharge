@@ -45,4 +45,8 @@ public final class Constants {
     // DriveTrain Configuration Constants
     public static final double  DT_OPENLOOP_RAMP_RATE  = .3;
     public static final int     DT_CONTINUOUS_CURRENT  = 20;
+
+    // DriveTrain Shifting Thresholds
+    public static final int UP_SHIFT_SPEED = 1500;
+    public static final int DOWN_SHIFT_SPEED = 1200;
 }

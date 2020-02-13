@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpiutil.math.MathUtil;
+import frc.robot.Robot;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 
 import static frc.robot.Constants.*;
@@ -31,6 +32,8 @@ public class DriveTrain extends SubsystemBase {
 
   private double m_LeftTalonModifier;
   private double m_rightTalonModifier;
+
+  private boolean m_IsLowGear;
 
   //private final AHRS navx;
   /**
@@ -73,6 +76,7 @@ public class DriveTrain extends SubsystemBase {
     m_rightFollower.configContinuousCurrentLimit(DT_CONTINUOUS_CURRENT);
 
     m_gearbox = new DoubleSolenoid(GEARBOX_SOLENOID_A, GEARBOX_SOLENOID_B);
+    setLowGear();
 
     // Talon Speed Modifiers
     m_LeftTalonModifier = SmartDashboard.getNumber("Decrese Right Speed by", 0);
@@ -81,7 +85,7 @@ public class DriveTrain extends SubsystemBase {
 
   public void teleop_drive(double left, double right){
     curvature_drive_imp(left, right, true);
-    //autoShiftGears();
+    autoShiftGears();
   }
 
   /*public void tank_drive_imp(double left_speed, double right_speed){
@@ -207,37 +211,32 @@ public class DriveTrain extends SubsystemBase {
   }
 
   public void setLowGear(){
-    m_gearbox.set(DoubleSolenoid.Value.kForward);
+    m_gearbox.set(DoubleSolenoid.Value.kReverse);
   }
 
   public void setHighGear(){
-    m_gearbox.set(DoubleSolenoid.Value.kReverse);
+    m_gearbox.set(DoubleSolenoid.Value.kForward);
   }
 
   public void autoShiftGears(){
 
-    boolean lowGear = false;
-    boolean highGear = false;
     int leftSpeed = m_leftLeader.getSelectedSensorVelocity();
     int rightSpeed = m_rightLeader.getSelectedSensorVelocity();
     DoubleSolenoid.Value solenoidPosition = m_gearbox.get();
-    double upShiftSpeed = 1600;
-    double downShiftSpeed = 1200;
     double currentSpeed = Math.max(Math.abs(leftSpeed), Math.abs(rightSpeed));
 
-    if((currentSpeed > upShiftSpeed) && (solenoidPosition == Value.kReverse)){
-      //High to Low
-      setLowGear();
-      lowGear = true;
-    }
-    else if((currentSpeed < downShiftSpeed) && (solenoidPosition == Value.kForward)){
+    if((currentSpeed > UP_SHIFT_SPEED) && (solenoidPosition == Value.kForward)){
       //Low to High
+      setLowGear();
+      m_IsLowGear = false;
+    }
+    else if((currentSpeed < DOWN_SHIFT_SPEED) && (solenoidPosition == Value.kReverse)){
+      //High to Low
       setHighGear();
-      lowGear = false;
+      m_IsLowGear = true;
     }
 
-    SmartDashboard.putBoolean("Low Gear", lowGear);
-    SmartDashboard.putBoolean("High Gear", highGear);
+    SmartDashboard.putBoolean("Low Gear", m_IsLowGear);
     SmartDashboard.putNumber("Current Speed", currentSpeed);
   }
 }
