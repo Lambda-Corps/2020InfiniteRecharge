@@ -121,7 +121,6 @@ public class RobotContainer {
     Shuffleboard.getTab("Climber").add("ExtendSolenoid",new ExtendClimberSolenoid(m_climber));
     Shuffleboard.getTab("Climber").add("RetractSolnoid",new RetractClimberSolenoid(m_climber));
   }
-<<<<<<< HEAD
 
   public void setLowGear(){
     m_drive_train.setLowGear();
@@ -129,12 +128,11 @@ public class RobotContainer {
 
   public void setHighGear(){
     m_drive_train.setHighGear();
-=======
+  }
   private void setupDriveMMShuffleboard(){
     // First, assign a local variable the Tab that we are going to use
     // for pid tuning in Shuffleboard
     Shuffleboard.getTab("Drive MM Testing").add(new DriveMM(m_drive_train, 0)).withPosition(0, 2);
 
->>>>>>> Trying to fixup merge conflicts.
   }
 }

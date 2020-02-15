@@ -41,16 +41,11 @@ public class DriveTrain extends SubsystemBase {
   private static final int kTimeoutMs = 5;
   private static final int kSlotIdx = 0;
   private static double m_tolerance = 10;
-  private DriveMM m_driveMM;
-  private DoubleSolenoid m_gearbox;
   private double m_LeftTalonModifier;
   private double m_rightTalonModifier;
-<<<<<<< HEAD
 
   private boolean m_IsLowGear;
 
-=======
->>>>>>> Trying to fixup merge conflicts.
   //private final AHRS navx;
   /**
    * Creates a new DriveTrain.
@@ -224,12 +219,9 @@ public class DriveTrain extends SubsystemBase {
 
   @Override
   public void periodic() {
-<<<<<<< HEAD
     SmartDashboard.putNumber("Left Velocity", m_leftLeader.getSelectedSensorVelocity());
     SmartDashboard.putNumber("Right Velocity", m_rightLeader.getSelectedSensorVelocity());
-=======
     // This method will be called once per scheduler run
->>>>>>> Trying to fixup merge conflicts.
   }
 
   public void stopMotors() {
@@ -290,7 +282,6 @@ public class DriveTrain extends SubsystemBase {
   public void motionMagicDrive(double m_target_position) {
     
   }
-<<<<<<< HEAD
 
   public void setLowGear(){
     m_gearbox.set(DoubleSolenoid.Value.kReverse);
@@ -322,6 +313,3 @@ public class DriveTrain extends SubsystemBase {
     SmartDashboard.putNumber("Current Speed", currentSpeed);
   }
 }
-=======
-}
->>>>>>> Trying to fixup merge conflicts.
