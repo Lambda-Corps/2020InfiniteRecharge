@@ -38,7 +38,7 @@ public class DriveMM extends CommandBase {
     m_kFEntry = driveMMTab.add("kF", 0 ).withPosition(0, 0).getEntry();
     m_iterationEntry = driveMMTab.add("stable iteration before finishing", 5 ).withPosition(0, 1).getEntry();
     m_targetPosEntry = driveMMTab.add("target position", 0).withPosition(4, 0).getEntry();
-    m_targetMultEntry = driveMMTab.add("target multiplier", 0).withPosition(5, 0).getEntry();
+   // m_targetMultEntry = driveMMTab.add("target multiplier", 0).withPosition(5, 0).getEntry();
     driveMMTab.addNumber("Left Encoder", m_drivetrain::getLeftEncoderValue).withPosition(1, 1);
     driveMMTab.addNumber("Right Encoder", m_drivetrain::getRightEncoderValue).withPosition(2,1);
     m_drivedurationEntry = driveMMTab.add("drive duration", 0).withPosition(6, 0).getEntry();
@@ -85,9 +85,9 @@ public class DriveMM extends CommandBase {
     // m_target_multiplier = SmartDashboard.getNumber("target multiplier", 0);
    
     m_start_time = Timer.getFPGATimestamp();
-    /*512 ticks per 1 rotation * 50/34 * 36/12 (gearing) = ~2258.824 ticks/1 wheel rotation (2259 is rounded)
-      2259 ticks per 1 rotation / (pi * 6.3125 in (wheel diameter)) = 113.911 ticks per 1 inch*/
-    this.m_target_position = m_target_position * 113.911;
+    /*512 ticks per 1 rotation * 54/30 * 36/12 (gearing) = ~2764.8 ticks/1 wheel rotation (2765 is rounded)
+      2765 ticks per 1 rotation / (pi * 6.3125 in (wheel diameter)) = 139.416 ticks per 1 inch*/
+    this.m_target_position = m_target_position * 139.416;
     count_ok = 0;
     m_drivetrain.reset_drivetrain_encoders();
     m_drivetrain.reset_PID_values(m_drive_kP, m_kI, m_kD);
