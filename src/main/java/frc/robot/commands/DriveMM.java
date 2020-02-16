@@ -11,7 +11,6 @@ import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.DriveTrain;
 
@@ -43,14 +42,6 @@ public class DriveMM extends CommandBase {
     driveMMTab.addNumber("Right Encoder", m_drivetrain::getRightEncoderValue).withPosition(2,1);
     m_drivedurationEntry = driveMMTab.add("drive duration", 0).withPosition(6, 0).getEntry();
     m_countokEntry = driveMMTab.add("count_ok", 0).getEntry();
-    // SmartDashboard.putNumber("kF", 0);
-    // SmartDashboard.putNumber("drive kP", 0);
-    // SmartDashboard.putNumber("kI", 0);
-    // SmartDashboard.putNumber("kD", 0);
-    // SmartDashboard.putNumber("stable iterations before finished", 5);
-    // SmartDashboard.putNumber("target position", 0);
-    // SmartDashboard.putNumber("target multiplier", 0);
-
   
     addRequirements(m_drivetrain);
     //super("DriveMM", 5);
@@ -58,12 +49,6 @@ public class DriveMM extends CommandBase {
     // Use addRequirements() here to declare subsystem dependencies.
 
   }
-  // public DriveMM(DriveTrain driveTrain, double goal_distance, double timeout){
-  //   m_drivetrain = driveTrain;
-  //   addRequirements(m_drivetrain);
-  //   //super("DriveMM", timeout);
-  //   this.m_target_position = goal_distance;
-  // }
 
   // Called when the command is initially scheduled.
   @Override
@@ -75,22 +60,14 @@ public class DriveMM extends CommandBase {
     STABLE_ITERATIONS_BEFORE_FINISHED = (int) m_iterationEntry.getDouble(5.0);
     m_target_position = m_targetPosEntry.getDouble(0.0);
     //m_target_multiplier = m_targetMultEntry.getDouble(0.0);
-    
-    // m_kF = SmartDashboard.getNumber("kF", 0);
-    // m_drive_kP = SmartDashboard.getNumber("drive kP", 0);
-    // m_kI = SmartDashboard.getNumber("kI", 0);
-    // m_kD = SmartDashboard.getNumber("kD", 0);
-    // STABLE_ITERATIONS_BEFORE_FINISHED = (int) SmartDashboard.getNumber("stable iterations before finished", 5);
-    // m_target_position = SmartDashboard.getNumber("target position", 0);
-    // m_target_multiplier = SmartDashboard.getNumber("target multiplier", 0);
-   
+
     m_start_time = Timer.getFPGATimestamp();
     /*512 ticks per 1 rotation * 54/30 * 36/12 (gearing) = ~2764.8 ticks/1 wheel rotation (2765 is rounded)
       2765 ticks per 1 rotation / (pi * 6.3125 in (wheel diameter)) = 139.416 ticks per 1 inch*/
     this.m_target_position = m_target_position * 139.416;
     count_ok = 0;
     m_drivetrain.reset_drivetrain_encoders();
-    m_drivetrain.reset_PID_values(m_drive_kP, m_kI, m_kD);
+    m_drivetrain.reset_drive_PID_values(m_drive_kP, m_kI, m_kD);
     m_drivetrain.motion_magic_start_config_drive();
 
   }
@@ -98,29 +75,21 @@ public class DriveMM extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_drivetrain.motionMagicDrive(m_target_position);
-    if(m_drivetrain.motionMagicOnTargetDrive(m_target_position)){
+    if(m_drivetrain.motionMagicDrive(m_target_position)){
       count_ok++;
     } else {
       count_ok = 0;
-      //System.out.println("MM not on target");
     }
-    m_countokEntry.setDouble(count_ok);
-
   }
 
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    //m_drivetrain.arcadeDrive(0, 0, false); would this be curvature drive now?
     m_drivetrain.motion_magic_end_config_drive();
     double drive_duration = Timer.getFPGATimestamp() - m_start_time;
-    //m_drivedurationEntry = driveMMTab.add("drive duration", drive_duration).withPosition(3, 1).getEntry();
-
     m_drivedurationEntry.setDouble(drive_duration);
-    //SmartDashboard.putNumber("drive duration", drive_duration);
-    // m_drivetrain.get_sensor_values();
+    m_drivetrain.stopMotors();
   }
 
   // Returns true when the command should end.

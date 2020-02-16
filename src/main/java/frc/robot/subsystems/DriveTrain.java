@@ -7,6 +7,8 @@
 
 package frc.robot.subsystems;
 
+import static frc.robot.Constants.*;
+
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.InvertType;
@@ -18,11 +20,6 @@ import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpiutil.math.MathUtil;
-import frc.robot.Robot;
-import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
-
-import static frc.robot.Constants.*;
-import frc.robot.commands.DriveMM;
 public class DriveTrain extends SubsystemBase {
   private double m_quickStopThreshold = .2;
   private double m_quickStopAlpha = .1;
@@ -37,6 +34,17 @@ public class DriveTrain extends SubsystemBase {
   private static final double kP_drive = 0;
   private static final double kI = 0;
   private static final double kD = 0;
+
+  private static final double kF_turn_small = 0;
+  private static final double kP_turn_small = 0;
+  private static final double kI_turn_small = 0;
+  private static final double kD_turn_small = 0;
+
+  private static final double kF_turn_big = 0;
+  private static final double kP_turn_big = 0;
+  private static final double kI_turn_big = 0;
+  private static final double kD_turn_big = 0;
+
 
   private static final int kPIDLoopIdx = 0;
   private static final int kTimeoutMs = 5;
@@ -246,6 +254,8 @@ public class DriveTrain extends SubsystemBase {
 
   //Motion Magic
   public void motion_magic_start_config_drive(){
+    m_leftLeader.selectProfileSlot(DT_SLOT_DRIVE_MM, PID_PRIMARY);
+    m_rightLeader.selectProfileSlot(DT_SLOT_DRIVE_MM, PID_PRIMARY);
     m_leftLeader.configPeakOutputForward(1, kTimeoutMs); //TODO find values
     m_leftLeader.configPeakOutputReverse(-1, kTimeoutMs);
   }
@@ -253,21 +263,22 @@ public class DriveTrain extends SubsystemBase {
     m_leftLeader.configPeakOutputForward(1, kTimeoutMs);
     m_leftLeader.configPeakOutputReverse(-1, kTimeoutMs);
   }
-  public boolean motionMagicOnTargetDrive(double target) {
-    double tolerance = 10;
-    m_tolerance = tolerance;
-    double current_position_L = m_leftLeader.getSelectedSensorPosition();
-    double current_position_R = m_rightLeader.getSelectedSensorPosition();
-    
-    return Math.abs(current_position_L - target) < tolerance && (current_position_R - target) < tolerance;
-  }
-  public void get_sensor_values() {
-    // m_driveMM.driveMMTab.add("end left", m_leftLeader.getSelectedSensorPosition()).getEntry();
-    // m_driveMM.driveMMTab.add("end right", m_rightLeader.getSelectedSensorPosition()).getEntry();
-    SmartDashboard.putNumber("end left", m_leftLeader.getSelectedSensorPosition());
-    SmartDashboard.putNumber("end right", m_rightLeader.getSelectedSensorPosition());
+
+  public void motion_magic_start_config_turn(double degrees){
+    if( degrees > 45 ){
+      // config big
+    }
+    else {
+      // config small
+    }
+    m_leftLeader.selectProfileSlot(DT_SLOT_TURN_MM, PID_PRIMARY);
+    m_rightLeader.selectProfileSlot(DT_SLOT_TURN_MM, PID_PRIMARY);
   }
 
+  public void motion_magic_end_config_turn(){
+
+  }
+  
   public int getLeftEncoderValue(){
     return m_leftLeader.getSelectedSensorPosition();
   }
@@ -276,12 +287,66 @@ public class DriveTrain extends SubsystemBase {
     return m_rightLeader.getSelectedSensorPosition();
   }
 
-  public void reset_PID_values(double m_drive_kP, double m_kI, double m_kD) {
+  public void reset_drive_PID_values(double kP, double kI, double kD) {
+    m_leftLeader.config_kP(DT_SLOT_DRIVE_MM, kP);
+    m_leftLeader.config_kI(DT_SLOT_DRIVE_MM, kI);
+    m_leftLeader.config_kD(DT_SLOT_DRIVE_MM, kD);
+    m_leftLeader.config_kF(DT_SLOT_DRIVE_MM, kF);
+    
+    m_rightLeader.config_kP(DT_SLOT_DRIVE_MM, kP);
+    m_rightLeader.config_kI(DT_SLOT_DRIVE_MM, kI);
+    m_rightLeader.config_kD(DT_SLOT_DRIVE_MM, kD);
+    m_rightLeader.config_kF(DT_SLOT_DRIVE_MM, kF);
+  }
+
+  public void reset_turn_PID_values(double kP, double kI, double kD) {
+    m_leftLeader.config_kP(DT_SLOT_TURN_MM, kP);
+    m_leftLeader.config_kI(DT_SLOT_TURN_MM, kI);
+    m_leftLeader.config_kD(DT_SLOT_TURN_MM, kD);
+    m_leftLeader.config_kF(DT_SLOT_TURN_MM, kF);
+
+    m_rightLeader.config_kP(DT_SLOT_TURN_MM, kP);
+    m_rightLeader.config_kI(DT_SLOT_TURN_MM, kI);
+    m_rightLeader.config_kD(DT_SLOT_TURN_MM, kD);
+    m_rightLeader.config_kF(DT_SLOT_TURN_MM, kF);
 
   }
 
-  public void motionMagicDrive(double m_target_position) {
+  public boolean motionMagicDrive(double target_position) {
+    double tolerance = 10;
     
+    m_leftLeader.set(ControlMode.MotionMagic, target_position);
+		m_rightLeader.set(ControlMode.MotionMagic, target_position);
+
+		double currentPos_L = m_leftLeader.getSelectedSensorPosition();
+		double currentPos_R = m_rightLeader.getSelectedSensorPosition();
+
+		return Math.abs(currentPos_L - target_position) < tolerance && (currentPos_R + target_position) < tolerance;
+  }
+
+  public boolean motionMagicTurn(int arc_in_ticks){
+    double tolerance = 10;
+    
+    m_leftLeader.set(ControlMode.MotionMagic, arc_in_ticks);
+		m_rightLeader.set(ControlMode.MotionMagic, -arc_in_ticks);
+
+		double currentPos_L = m_leftLeader.getSelectedSensorPosition();
+		double currentPos_R = m_rightLeader.getSelectedSensorPosition();
+
+		return Math.abs(currentPos_L - arc_in_ticks) < tolerance && (currentPos_R + arc_in_ticks) < tolerance;
+  }
+
+  public void motion_magic_start_config_turn(int degrees){
+    if( degrees > 45 ){
+      // Big Turn
+      // Set K,P,I,D for big turn gains
+    } else {
+      // Small Turn
+      // Set K, P, I, D for small turns
+    }
+
+    m_leftLeader.selectProfileSlot(DT_SLOT_TURN_MM, PID_PRIMARY);
+    m_rightLeader.selectProfileSlot(DT_SLOT_TURN_MM, PID_PRIMARY);
   }
 
   public void setLowGear(){

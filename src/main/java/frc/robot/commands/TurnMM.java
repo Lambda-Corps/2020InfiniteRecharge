@@ -16,7 +16,8 @@ import frc.robot.subsystems.DriveTrain;
 
 public class TurnMM extends CommandBase {
   DriveTrain m_drivetrain;
-  double m_arcLengthTicks, m_arcLengthDegrees;
+  int m_arcLengthTicks;
+  double m_arcLengthDegrees;
   int count_ok;
   private double m_start_time;
   int STABLE_ITERATIONS_BEFORE_FINISHED = 5;
@@ -50,9 +51,16 @@ public class TurnMM extends CommandBase {
   @Override
   public void initialize() {
     /*512 ticks per 1 rotation * 54/30 * 36/12 (gearing) = ~2764.8 ticks/1 wheel rotation (2765 is rounded)
-      2765 ticks per 1 rotation / (pi * 6.3125 in (wheel diameter)) = 139.416 ticks per 1 inch*/
-    this.m_arcLength = m_arcLength * 139.416 * 0.2443; 
-    //TODO see if inches per angle needs tuned (got the number from last year's notes/code)
+      2765 ticks per 1 rotation / (pi * 6.3125 in (wheel diameter)) = 139.416 ticks per 1 inch
+      Measured wheel base is 28 inches, so to figure out inches per degree of turning we take 
+      Circumference / 360.
+        28 * pi = 87.964594300514211 
+        87.965 / 360 degrees = .2443 degrees per inch
+
+      ArcLength in ticks = ticks per inch * degrees per inch * degrees to turn
+    */
+    m_arcLengthDegrees = m_arclengthEntry.getDouble(0);
+    m_arcLengthTicks = (int) (m_arcLengthDegrees * 139.416 * 0.2443);
     count_ok = 0;
     m_drivetrain.reset_drivetrain_encoders();
 
@@ -61,23 +69,17 @@ public class TurnMM extends CommandBase {
     m_kI = m_kIEntry.getDouble(0.0);
     m_kD = m_kDEntry.getDouble(0.0);
     STABLE_ITERATIONS_BEFORE_FINISHED = (int) m_iterationEntry.getDouble(5.0);
-    m_arcLengthDegrees = m_arclengthEntry.getDouble(0.0);
-    /*512 ticks per 1 rotation * 54/30 * 36/12 (gearing) = ~2764.8 ticks/1 wheel rotation (2765 is rounded)
-      2765 ticks per 1 rotation / (pi * 6.3125 in (wheel diameter)) = 139.416 ticks per 1 inch*/
-    this.m_arcLengthTicks = m_arcLengthDegrees * 139.416 * 0.2443; 
-    //TODO see if inches per angle needs tuned (got the number from last year's notes/code)
     m_start_time = Timer.getFPGATimestamp();
     count_ok = 0;
     m_drivetrain.reset_drivetrain_encoders();
-    m_drivetrain.reset_PID_values(m_turn_kP, m_kI, m_kD);
+    m_drivetrain.reset_turn_PID_values(m_turn_kP, m_kI, m_kD);
     m_drivetrain.motion_magic_start_config_turn(m_arcLengthDegrees);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_drivetrain.motionMagicTurn(m_arcLengthTicks);
-    if (m_drivetrain.motionMagicOnTargetTurn(m_arcLengthTicks)){
+    if (m_drivetrain.motionMagicTurn(m_arcLengthTicks)){
       count_ok++;
     } else {
       count_ok = 0;
@@ -88,9 +90,10 @@ public class TurnMM extends CommandBase {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_drivetrain.motion_magic_end_config_turn(m_arcLengthDegrees);
+    m_drivetrain.motion_magic_end_config_turn();
     double drive_duration = Timer.getFPGATimestamp() - m_start_time;
     m_drivedurationEntry.setDouble(drive_duration);
+    m_drivetrain.stopMotors();
   }
 
   // Returns true when the command should end.
