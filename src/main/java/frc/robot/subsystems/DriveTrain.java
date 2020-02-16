@@ -143,7 +143,7 @@ public class DriveTrain extends SubsystemBase {
   }
 
   public void teleop_drive(double left, double right){
-    curvature_drive_imp(left, right, true);
+    curvature_drive_imp(left, right, (right == 0) ? true : false);
     autoShiftGears();
   }
 
