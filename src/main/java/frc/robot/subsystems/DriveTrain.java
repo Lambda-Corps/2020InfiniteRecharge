@@ -17,6 +17,8 @@ import com.ctre.phoenix.motorcontrol.InvertType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.RemoteSensorSource;
 import com.ctre.phoenix.motorcontrol.SensorTerm;
+import com.ctre.phoenix.motorcontrol.StatusFrame;
+import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
@@ -100,11 +102,16 @@ public class DriveTrain extends SubsystemBase {
 		// Set the profile slot to PID Correcting as the initial
 		m_leftLeader.selectProfileSlot(DT_SLOT_AUXILIARY_PID, PID_AUXILIARY);
 		m_rightLeader.selectProfileSlot(DT_SLOT_AUXILIARY_PID, PID_AUXILIARY);
-		// config pidf values for Drive MM
-		m_leftLeader.config_kF(DT_SLOT_AUXILIARY_PID,  kGains_AuxPID.kF, kTimeoutMs);
-		m_leftLeader.config_kP(DT_SLOT_AUXILIARY_PID,  kGains_AuxPID.kP, kTimeoutMs);
-		m_leftLeader.config_kI(DT_SLOT_AUXILIARY_PID,  kGains_AuxPID.kI, kTimeoutMs);
-		m_leftLeader.config_kD(DT_SLOT_AUXILIARY_PID,  kGains_AuxPID.kD, kTimeoutMs);
+    // config pidf values for Drive MM
+    m_rightLeader.config_kF(DT_SLOT_DRIVE_MM, kGains_DriveMM.kF, kTimeoutMs);
+		m_rightLeader.config_kP(DT_SLOT_DRIVE_MM, kGains_DriveMM.kP, kTimeoutMs);
+		m_rightLeader.config_kI(DT_SLOT_DRIVE_MM, kGains_DriveMM.kI, kTimeoutMs);
+    m_rightLeader.config_kD(DT_SLOT_DRIVE_MM, kGains_DriveMM.kD, kTimeoutMs);
+    m_rightLeader.config_IntegralZone(DT_SLOT_DRIVE_MM, kGains_DriveMM.kIzone, kTimeoutMs);
+    m_rightLeader.configClosedLoopPeakOutput(DT_SLOT_DRIVE_MM, kGains_DriveMM.kPeakOutput, kTimeoutMs);
+    m_rightLeader.configAllowableClosedloopError(DT_SLOT_DRIVE_MM, 0, kTimeoutMs); // allowable error is 0, because we want to be straight
+
+    // config pidf values for Auxiliary PID 
 		m_rightLeader.config_kF(DT_SLOT_AUXILIARY_PID, kGains_AuxPID.kF, kTimeoutMs);
 		m_rightLeader.config_kP(DT_SLOT_AUXILIARY_PID, kGains_AuxPID.kP, kTimeoutMs);
 		m_rightLeader.config_kI(DT_SLOT_AUXILIARY_PID, kGains_AuxPID.kI, kTimeoutMs);
@@ -127,12 +134,24 @@ public class DriveTrain extends SubsystemBase {
                                              REMOTE_0,							// Source number [0, 1]
                                              kTimeoutMs);						// Configuration Timeout
 
+    /* Setup Sum signal to be used for Distance */
+    m_rightLeader.configSensorTerm(SensorTerm.Sum0, FeedbackDevice.RemoteSensor0, kTimeoutMs);				// Feedback Device of Remote Talon
+    m_rightLeader.configSensorTerm(SensorTerm.Sum1, FeedbackDevice.QuadEncoder, kTimeoutMs);	// Quadrature Encoder of current Talon
+
     /* Setup difference signal to be used for turn when performing Drive Straight with encoders */
     m_rightLeader.configSensorTerm(SensorTerm.Diff1, FeedbackDevice.RemoteSensor0, kTimeoutMs);	// Feedback Device of Remote Talon
     m_rightLeader.configSensorTerm(SensorTerm.Diff0, FeedbackDevice.QuadEncoder, kTimeoutMs);		// Quadrature Encoder of current Talon
 
-    /* Difference term calculated by right Talon configured to be selected sensor of turn PID */
+    /* Configure Sum [Sum of both QuadEncoders] to be used for Primary PID Index */
+    m_rightLeader.configSelectedFeedbackSensor(	FeedbackDevice.SensorSum, PID_PRIMARY, kTimeoutMs);
+
+    /* Scale Feedback by 0.5 to half the sum of Distance */
+    m_rightLeader.configSelectedFeedbackCoefficient(0.5, PID_PRIMARY,	kTimeoutMs);
+
+    /* Configure Difference [Difference between both QuadEncoders] to be used for Auxiliary PID Index */
     m_rightLeader.configSelectedFeedbackSensor(	FeedbackDevice.SensorDifference, PID_AUXILIARY, kTimeoutMs);
+    /* Scale the Feedback Sensor using a coefficient */
+    m_leftLeader.configSelectedFeedbackCoefficient(1, PID_AUXILIARY, kTimeoutMs);
     
     /* configAuxPIDPolarity(boolean invert, int timeoutMs)
 		 * false means talon's local output is PID0 + PID1, and other side Talon is PID0 - PID1
@@ -140,18 +159,35 @@ public class DriveTrain extends SubsystemBase {
      * Our left side is faster in the forward position (most common) so we'll go false
      * such that the correction is adding to the right and subtracting from the left
 		 */
-		m_rightLeader.configAuxPIDPolarity(false, kTimeoutMs);
+    m_rightLeader.configAuxPIDPolarity(false, kTimeoutMs);
+
+    int closedLoopTimeMs = 1;
+		m_rightLeader.configClosedLoopPeriod(PID_PRIMARY, closedLoopTimeMs, kTimeoutMs);
+		m_rightLeader.configClosedLoopPeriod(PID_AUXILIARY, closedLoopTimeMs, kTimeoutMs);
+    
+    /* Set status frame periods to ensure we don't have stale data */
+		m_rightLeader.setStatusFramePeriod(StatusFrame.Status_12_Feedback1, 20, kTimeoutMs);
+		m_rightLeader.setStatusFramePeriod(StatusFrame.Status_13_Base_PIDF0, 20, kTimeoutMs);
+		m_rightLeader.setStatusFramePeriod(StatusFrame.Status_14_Turn_PIDF1, 20, kTimeoutMs);
+		m_rightLeader.setStatusFramePeriod(StatusFrame.Status_10_Targets, 20, kTimeoutMs);
+    m_leftLeader.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 5, kTimeoutMs);
+    m_rightLeader.setStatusFramePeriod(StatusFrameEnhanced.Status_10_Targets, 10);
+
+		/* Configure neutral deadband */
+		m_rightLeader.configNeutralDeadband(TALON_NEUTRAL_DEADBAND, kTimeoutMs);
+		m_leftLeader.configNeutralDeadband(TALON_NEUTRAL_DEADBAND, kTimeoutMs);
     
 		// config cruise velocity, acceleration
-    m_leftLeader.configMotionCruiseVelocity(DT_MOTIONMAGIC_CRUISE, kTimeoutMs); 
-		m_leftLeader.configMotionAcceleration(DT_MOTIONMAGIC_ACCELERATION, kTimeoutMs); // cruise velocity / 2, so it will take 2 seconds
+    // m_leftLeader.configMotionCruiseVelocity(DT_MOTIONMAGIC_CRUISE, kTimeoutMs); 
+		// m_leftLeader.configMotionAcceleration(DT_MOTIONMAGIC_ACCELERATION, kTimeoutMs); // cruise velocity / 2, so it will take 2 seconds
 		m_rightLeader.configMotionCruiseVelocity(DT_MOTIONMAGIC_CRUISE, kTimeoutMs); 
 		m_rightLeader.configMotionAcceleration(DT_MOTIONMAGIC_CRUISE, kTimeoutMs); // cruise velocity / 2, so it will take 2 seconds
 		
 		// Set the quadrature encoders to be the source feedback device for the talons
 		m_leftLeader.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 0);
 		m_rightLeader.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 0);
-		
+    
+    SmartDashboard.putNumber("kp_aux_turn", 0);
   }
   
   public void teleop_drive(double left, double right){
@@ -163,17 +199,28 @@ public class DriveTrain extends SubsystemBase {
       m_isPIDCorrecting = false;
       curvature_drive_imp(left, right, (left == 0) ? true : false);
     } else {
-      if(! m_isPIDCorrecting ){
-        // We weren't previously correcting, so treat this as the first time as we're starting.
-        // Grab the current aux pid heading
-        m_auxPidTarget = m_rightLeader.getSelectedSensorPosition(PID_AUXILIARY);
-        // Set our profile to the auxiliary pid
-        m_rightLeader.selectProfileSlot(DT_SLOT_AUXILIARY_PID, PID_AUXILIARY);
-        
-      }
-      drive_straight_pid_corrected(left);
+      // Right = 0
+        if( left != 0 ){
+          if(! m_isPIDCorrecting ){
+            // We weren't previously correcting, so treat this as the first time as we're starting.
+            //reset_drivetrain_encoders();
+            // Grab the current aux pid heading
+            m_auxPidTarget = m_rightLeader.getSelectedSensorPosition(PID_AUXILIARY);
+            // Set our profile to the auxiliary pid
+            m_rightLeader.selectProfileSlot(DT_SLOT_AUXILIARY_PID, PID_AUXILIARY);
+            double kp_turn = SmartDashboard.getNumber("kp_aux_turn", 0);
+            m_rightLeader.config_kP(PID_AUXILIARY, kp_turn);
+            m_isPIDCorrecting = true;
+          }
+          drive_straight_pid_corrected(left);
+        } else {
+          // Right = 0, Left = 0
+          curvature_drive_imp(left, right, false);
+          // We have no left input, so reset pid correcting to false
+          m_isPIDCorrecting = false;
+        }
     }
-    autoShiftGears();
+    //autoShiftGears();
   }
     
   private double normalize(double speed) {
@@ -277,6 +324,14 @@ public class DriveTrain extends SubsystemBase {
   public void periodic() {
     SmartDashboard.putNumber("Left Velocity", m_leftLeader.getSelectedSensorVelocity());
     SmartDashboard.putNumber("Right Velocity", m_rightLeader.getSelectedSensorVelocity());
+    SmartDashboard.putNumber("Aux Error", m_rightLeader.getClosedLoopError(DT_SLOT_AUXILIARY_PID));
+    SmartDashboard.putNumber("L0 Encoder", m_leftLeader.getSelectedSensorPosition(PID_PRIMARY));
+    SmartDashboard.putNumber("R0 Encoder", m_rightLeader.getSelectedSensorPosition(PID_PRIMARY));
+    SmartDashboard.putNumber("L1 Encoder", m_leftLeader.getSelectedSensorPosition(PID_AUXILIARY));
+    SmartDashboard.putNumber("R1 Encoder", m_rightLeader.getSelectedSensorPosition(PID_AUXILIARY));
+    SmartDashboard.putNumber("Aux Pid Target", m_auxPidTarget);
+    SmartDashboard.putBoolean("isCorrecting", m_isPIDCorrecting);
+    SmartDashboard.putBoolean("Is Low Gear", isLowGear());
     // This method will be called once per scheduler run
   }
 
@@ -399,11 +454,11 @@ public class DriveTrain extends SubsystemBase {
   }
 
   public void setLowGear(){
-    m_gearbox.set(DoubleSolenoid.Value.kReverse);
+    m_gearbox.set(DoubleSolenoid.Value.kForward);
   }
 
   public void setHighGear(){
-    m_gearbox.set(DoubleSolenoid.Value.kForward);
+    m_gearbox.set(DoubleSolenoid.Value.kReverse);
   }
 
   public void autoShiftGears(){
@@ -425,6 +480,6 @@ public class DriveTrain extends SubsystemBase {
 
   @SuppressWarnings("unused")
   private boolean isLowGear(){
-    return (m_gearbox.get() == DoubleSolenoid.Value.kReverse);
+    return (m_gearbox.get() == DoubleSolenoid.Value.kForward);
   }
 }
