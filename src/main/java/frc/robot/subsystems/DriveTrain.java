@@ -151,18 +151,6 @@ public class DriveTrain extends SubsystemBase {
 		m_rightLeader.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 0);
 		
   }
-
-  public double normalize(double value) {
-		if (value > 1.0) {
-			value = 1.0;
-		} else if (value < -1.0) {
-			value = -1.0;
-		}
-		if (value > -CONTROLLER_DEADBAND && value < CONTROLLER_DEADBAND) {
-			value = 0.0;
-		}
-		return value;
-  }
   
   public void teleop_drive(double left, double right){
     left  = normalize(left);
@@ -171,7 +159,7 @@ public class DriveTrain extends SubsystemBase {
     if( right != 0){
       // We are turning, either in place or while we drive so we won't correct based on encoders
       m_isPIDCorrecting = false;
-      curvature_drive_imp(left, right, (right == 0) ? true : false);
+      curvature_drive_imp(left, right, (left == 0) ? true : false);
     } else {
       if(! m_isPIDCorrecting ){
         // We weren't previously correcting, so treat this as the first time as we're starting.
@@ -183,8 +171,19 @@ public class DriveTrain extends SubsystemBase {
       }
       drive_straight_pid_corrected(left);
     }
-    
     autoShiftGears();
+  }
+    
+  private double normalize(double speed) {
+    if (speed > 1) {
+      speed = 1;
+    } else if (speed < -1) {
+      speed = -1;
+    }
+    if (speed >= CONTROLLER_DEADBAND_NEGATIVE && speed <= CONTROLLER_DEADBAND_POSOTIVE) {
+      speed = 0;
+    }
+    return speed;
   }
 
   private void drive_straight_pid_corrected(double speed){

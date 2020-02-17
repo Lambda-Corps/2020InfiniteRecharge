@@ -21,7 +21,8 @@ public final class Constants {
     public static final int DRIVER_RIGHT_AXIS    = 4;
     public static final int DRIVER_LEFT_AXIS     = 1;
     public static final int PARTNER_REMOTE_PORT  = 1;
-    public static final double CONTROLLER_DEADBAND = .05;
+    public static final double CONTROLLER_DEADBAND_POSOTIVE = 0.1;
+    public static final double CONTROLLER_DEADBAND_NEGATIVE = -0.1;
    //Climbing Subsytem
     public static final int TOP_LIMIT_SWITCH     = 1;
     public static final int BOTTEM_LIMIT_SWITCH  = 0;
