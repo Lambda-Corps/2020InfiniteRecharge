@@ -208,6 +208,12 @@ public class DriveTrain extends SubsystemBase {
       leftMotorOutput /= maxMagnitude;
       rightMotorOutput /= maxMagnitude;
     }
+    
+    if (leftMotorOutput < 0) {
+      leftMotorOutput *= DT_REVERSE_L_MODIFIER;
+    } else {
+      leftMotorOutput *= DT_FORWARD_L_MODIFIER;
+    }
 
     m_leftLeader.set(ControlMode.PercentOutput, leftMotorOutput);
     m_rightLeader.set(ControlMode.PercentOutput, rightMotorOutput);

@@ -52,6 +52,8 @@ public final class Constants {
     // DriveTrain Shifting Thresholds
     public static final int UP_SHIFT_SPEED = 1500;
     public static final int DOWN_SHIFT_SPEED = 1200;
+    public static final double DT_FORWARD_L_MODIFIER = .951;
+    public static final double DT_REVERSE_L_MODIFIER = .969;
 
     // Closed Loop
     /**
