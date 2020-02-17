@@ -21,6 +21,7 @@ public final class Constants {
     public static final int DRIVER_RIGHT_AXIS    = 4;
     public static final int DRIVER_LEFT_AXIS     = 1;
     public static final int PARTNER_REMOTE_PORT  = 1;
+    public static final double CONTROLLER_DEADBAND = .05;
    //Climbing Subsytem
     public static final int TOP_LIMIT_SWITCH     = 1;
     public static final int BOTTEM_LIMIT_SWITCH  = 0;
@@ -44,8 +45,10 @@ public final class Constants {
     // DriveTrain Configuration Constants
     public static final double  DT_OPENLOOP_RAMP_RATE  = .3;
     public static final int     DT_CONTINUOUS_CURRENT  = 20;
-    public static final double OPEN_LOOP_PEAK_OUTPUT_F = 1;
-    public static final double OPEN_LOOP_PEAK_OUTPUT_B = -1;
+    public static final double DT_OPEN_LOOP_PEAK_OUTPUT_F = 1;
+    public static final double DT_OPEN_LOOP_PEAK_OUTPUT_B = -1;
+    public static final int    DT_MOTIONMAGIC_CRUISE = 3000;
+    public static final int    DT_MOTIONMAGIC_ACCELERATION = 1500;
 
     // DriveTrain Shifting Thresholds
     public static final int UP_SHIFT_SPEED = 1500;
@@ -61,7 +64,8 @@ public final class Constants {
 	public final static Gains kGains_DriveMM = new Gains( 0.1, 0.0,  0.0, 0.0,            100,  0.50 );
 	public final static Gains kGains_TurnMM = new Gains( 2.0, 0.0,  4.0, 0.0,            200,  1.00 );
 	public final static Gains kGains_Shooter = new Gains( 0.1, 0.0, 20.0, 1023.0/6800.0,  300,  0.50 );
-	public final static Gains kGains_MotProf = new Gains( 1.0, 0.0,  0.0, 1023.0/3200.0,  400,  1.00 );
+    public final static Gains kGains_MotProf = new Gains( 1.0, 0.0,  0.0, 1023.0/3200.0,  400,  1.00 );
+    public final static Gains kGains_AuxPID = new Gains( 2.0, 0.0,  4.0, 0.0,            200,  1.00 );
 	
 	/** ---- Flat constants, you should not need to change these ---- */
 	/* We allow either a 0 or 1 when selecting an ordinal for remote devices [You can have up to 2 devices assigned remotely to a talon/victor] */

@@ -10,9 +10,13 @@ package frc.robot.subsystems;
 import static frc.robot.Constants.*;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
+import com.ctre.phoenix.motorcontrol.FollowerType;
 import com.ctre.phoenix.motorcontrol.InvertType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.RemoteSensorSource;
+import com.ctre.phoenix.motorcontrol.SensorTerm;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
@@ -20,6 +24,7 @@ import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpiutil.math.MathUtil;
+import frc.robot.Constants;
 public class DriveTrain extends SubsystemBase {
   private double m_quickStopThreshold = .2;
   private double m_quickStopAlpha = .1;
@@ -30,30 +35,12 @@ public class DriveTrain extends SubsystemBase {
   private final TalonSRX m_leftLeader, m_leftFollower;
   private final DoubleSolenoid m_gearbox;
 
-  private static final double kF = 0;
-  private static final double kP_drive = 0;
-  private static final double kI = 0;
-  private static final double kD = 0;
-
-  private static final double kF_turn_small = 0;
-  private static final double kP_turn_small = 0;
-  private static final double kI_turn_small = 0;
-  private static final double kD_turn_small = 0;
-
-  private static final double kF_turn_big = 0;
-  private static final double kP_turn_big = 0;
-  private static final double kI_turn_big = 0;
-  private static final double kD_turn_big = 0;
-
-
-  private static final int kPIDLoopIdx = 0;
   private static final int kTimeoutMs = 5;
-  private static final int kSlotIdx = 0;
-  private static double m_tolerance = 10;
-  private double m_LeftTalonModifier;
-  private double m_rightTalonModifier;
 
   private boolean m_IsLowGear;
+
+  private boolean m_isPIDCorrecting;
+  private int m_auxPidTarget;
 
   //private final AHRS navx;
   /**
@@ -95,56 +82,116 @@ public class DriveTrain extends SubsystemBase {
 
     m_gearbox = new DoubleSolenoid(GEARBOX_SOLENOID_A, GEARBOX_SOLENOID_B);
     setLowGear();
+    m_IsLowGear = true;
 
-    // Talon Speed Modifiers
-    m_LeftTalonModifier = SmartDashboard.getNumber("Decrese Right Speed by", 0);
-    m_rightTalonModifier = SmartDashboard.getNumber("Decrese Left Speed by", 0);
     		// Set up Motion Magic
-		// nominal output forward (0)
+		// Set the minimums for forward and back
 		m_leftLeader.configNominalOutputForward(0, kTimeoutMs);
 		m_rightLeader.configNominalOutputForward(0, kTimeoutMs);
-		// nominal output reverse (0)
 		m_leftLeader.configNominalOutputReverse(0, kTimeoutMs);
 		m_rightLeader.configNominalOutputReverse(0, kTimeoutMs);
-		// peak output forward (1)
-		m_leftLeader.configPeakOutputForward(OPEN_LOOP_PEAK_OUTPUT_F, kTimeoutMs);
-		m_rightLeader.configPeakOutputForward(OPEN_LOOP_PEAK_OUTPUT_F, kTimeoutMs);
-		// peak output reverse (-1)
-		m_leftLeader.configPeakOutputReverse(OPEN_LOOP_PEAK_OUTPUT_B, kTimeoutMs);
-		m_rightLeader.configPeakOutputReverse(OPEN_LOOP_PEAK_OUTPUT_B, kTimeoutMs);
-		// select profile slot
-		m_leftLeader.selectProfileSlot(kSlotIdx, kPIDLoopIdx);
-		m_rightLeader.selectProfileSlot(kSlotIdx, kPIDLoopIdx);
-		// config pidf values
-		m_leftLeader.config_kF(kSlotIdx, kF, kTimeoutMs);
-		m_leftLeader.config_kP(kSlotIdx, kP_drive, kTimeoutMs);
-		m_leftLeader.config_kI(kSlotIdx, kI, kTimeoutMs);
-		m_leftLeader.config_kD(kSlotIdx, kD, kTimeoutMs);
-		m_rightLeader.config_kF(kSlotIdx, kF, kTimeoutMs);
-		m_rightLeader.config_kP(kSlotIdx, kP_drive, kTimeoutMs);
-		m_rightLeader.config_kI(kSlotIdx, kI, kTimeoutMs);
-		m_rightLeader.config_kD(kSlotIdx, kD, kTimeoutMs);
+		// Setup the forward and reverse peak outputs
+		m_leftLeader.configPeakOutputForward(DT_OPEN_LOOP_PEAK_OUTPUT_F, kTimeoutMs);
+		m_rightLeader.configPeakOutputForward(DT_OPEN_LOOP_PEAK_OUTPUT_F, kTimeoutMs);
+		m_leftLeader.configPeakOutputReverse(DT_OPEN_LOOP_PEAK_OUTPUT_B, kTimeoutMs);
+    m_rightLeader.configPeakOutputReverse(DT_OPEN_LOOP_PEAK_OUTPUT_B, kTimeoutMs);
+    
+		// Set the profile slot to PID Correcting as the initial
+		m_leftLeader.selectProfileSlot(DT_SLOT_AUXILIARY_PID, PID_AUXILIARY);
+		m_rightLeader.selectProfileSlot(DT_SLOT_AUXILIARY_PID, PID_AUXILIARY);
+		// config pidf values for Drive MM
+		m_leftLeader.config_kF(DT_SLOT_AUXILIARY_PID,  kGains_AuxPID.kF, kTimeoutMs);
+		m_leftLeader.config_kP(DT_SLOT_AUXILIARY_PID,  kGains_AuxPID.kP, kTimeoutMs);
+		m_leftLeader.config_kI(DT_SLOT_AUXILIARY_PID,  kGains_AuxPID.kI, kTimeoutMs);
+		m_leftLeader.config_kD(DT_SLOT_AUXILIARY_PID,  kGains_AuxPID.kD, kTimeoutMs);
+		m_rightLeader.config_kF(DT_SLOT_AUXILIARY_PID, kGains_AuxPID.kF, kTimeoutMs);
+		m_rightLeader.config_kP(DT_SLOT_AUXILIARY_PID, kGains_AuxPID.kP, kTimeoutMs);
+		m_rightLeader.config_kI(DT_SLOT_AUXILIARY_PID, kGains_AuxPID.kI, kTimeoutMs);
+    m_rightLeader.config_kD(DT_SLOT_AUXILIARY_PID, kGains_AuxPID.kD, kTimeoutMs);
+    m_leftLeader.configAllowableClosedloopError(DT_SLOT_AUXILIARY_PID, 0, kTimeoutMs); // allowable error is 0, because we want to be straight
+    m_rightLeader.configAllowableClosedloopError(DT_SLOT_AUXILIARY_PID, 0, kTimeoutMs); // allowable error is 0, because we want to be straight
+    // reset sensors
+		m_leftLeader.getSensorCollection().setQuadraturePosition(0, kTimeoutMs);
+    m_rightLeader.getSensorCollection().setQuadraturePosition(0, kTimeoutMs);
+
+    // Setup the remote sensor for the differential auxiliary PID
+    /* Configure the drivetrain's left side Feedback Sensor as a Quadrature Encoder */
+		m_leftLeader.configSelectedFeedbackSensor(	FeedbackDevice.QuadEncoder,			// Local Feedback Source
+                                                PID_PRIMARY,				// PID Slot for Source [0, 1]
+                                                kTimeoutMs);				// Configuration Timeout
+
+    /* Configure the left Talon's Selected Sensor to be a remote sensor for the right Talon */
+    m_rightLeader.configRemoteFeedbackFilter(m_leftLeader.getDeviceID(),					// Device ID of Source
+                                             RemoteSensorSource.TalonSRX_SelectedSensor,	// Remote Feedback Source
+                                             REMOTE_0,							// Source number [0, 1]
+                                             kTimeoutMs);						// Configuration Timeout
+
+    /* Setup difference signal to be used for turn when performing Drive Straight with encoders */
+    m_rightLeader.configSensorTerm(SensorTerm.Diff1, FeedbackDevice.RemoteSensor0, kTimeoutMs);	// Feedback Device of Remote Talon
+    m_rightLeader.configSensorTerm(SensorTerm.Diff0, FeedbackDevice.QuadEncoder, kTimeoutMs);		// Quadrature Encoder of current Talon
+
+    /* Difference term calculated by right Talon configured to be selected sensor of turn PID */
+    m_rightLeader.configSelectedFeedbackSensor(	FeedbackDevice.SensorDifference, PID_AUXILIARY, kTimeoutMs);
+    
+    /* configAuxPIDPolarity(boolean invert, int timeoutMs)
+		 * false means talon's local output is PID0 + PID1, and other side Talon is PID0 - PID1
+		 * true means talon's local output is PID0 - PID1, and other side Talon is PID0 + PID1
+     * Our left side is faster in the forward position (most common) so we'll go false
+     * such that the correction is adding to the right and subtracting from the left
+		 */
+		m_rightLeader.configAuxPIDPolarity(false, kTimeoutMs);
+    
 		// config cruise velocity, acceleration
-    m_leftLeader.configMotionCruiseVelocity(3000, kTimeoutMs); 
-		m_leftLeader.configMotionAcceleration(1500, kTimeoutMs); // cruise velocity / 2, so it will take 2 seconds
-		m_rightLeader.configMotionCruiseVelocity(3000, kTimeoutMs); 
-		m_rightLeader.configMotionAcceleration(1500, kTimeoutMs); // cruise velocity / 2, so it will take 2 seconds
+    m_leftLeader.configMotionCruiseVelocity(DT_MOTIONMAGIC_CRUISE, kTimeoutMs); 
+		m_leftLeader.configMotionAcceleration(DT_MOTIONMAGIC_ACCELERATION, kTimeoutMs); // cruise velocity / 2, so it will take 2 seconds
+		m_rightLeader.configMotionCruiseVelocity(DT_MOTIONMAGIC_CRUISE, kTimeoutMs); 
+		m_rightLeader.configMotionAcceleration(DT_MOTIONMAGIC_CRUISE, kTimeoutMs); // cruise velocity / 2, so it will take 2 seconds
 		
-
-		m_leftLeader.configAllowableClosedloopError(0, 10, 3);
-		m_rightLeader.configAllowableClosedloopError(0, 10, 3);
-
 		// Set the quadrature encoders to be the source feedback device for the talons
 		m_leftLeader.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 0);
 		m_rightLeader.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 0);
-		// reset sensors
-		m_leftLeader.setSelectedSensorPosition(0, kPIDLoopIdx, kTimeoutMs);
-    m_rightLeader.setSelectedSensorPosition(0, kPIDLoopIdx, kTimeoutMs);
+		
   }
 
+  public double normalize(double value) {
+		if (value > 1.0) {
+			value = 1.0;
+		} else if (value < -1.0) {
+			value = -1.0;
+		}
+		if (value > -CONTROLLER_DEADBAND && value < CONTROLLER_DEADBAND) {
+			value = 0.0;
+		}
+		return value;
+  }
+  
   public void teleop_drive(double left, double right){
-    curvature_drive_imp(left, right, (right == 0) ? true : false);
+    left  = normalize(left);
+    right = normalize(right);
+    
+    if( right != 0){
+      // We are turning, either in place or while we drive so we won't correct based on encoders
+      m_isPIDCorrecting = false;
+      curvature_drive_imp(left, right, (right == 0) ? true : false);
+    } else {
+      if(! m_isPIDCorrecting ){
+        // We weren't previously correcting, so treat this as the first time as we're starting.
+        // Grab the current aux pid heading
+        m_auxPidTarget = m_rightLeader.getSelectedSensorPosition(PID_AUXILIARY);
+        // Set our profile to the auxiliary pid
+        m_rightLeader.selectProfileSlot(DT_SLOT_AUXILIARY_PID, PID_AUXILIARY);
+        
+      }
+      drive_straight_pid_corrected(left);
+    }
+    
     autoShiftGears();
+  }
+
+  private void drive_straight_pid_corrected(double speed){
+    /* Configured for percentOutput with Auxiliary PID on Quadrature Encoders' Difference */
+			m_rightLeader.set(ControlMode.PercentOutput, speed, DemandType.AuxPID, m_auxPidTarget);
+			m_leftLeader.follow(m_rightLeader, FollowerType.AuxOutput1);
   }
 
   /* private void tank_drive_imp(double left_speed, double right_speed){
@@ -248,20 +295,24 @@ public class DriveTrain extends SubsystemBase {
     return (leftErr <= tolerance) && (rightErr <= tolerance);
   }
   public void reset_drivetrain_encoders() {
-    m_leftLeader.setSelectedSensorPosition(0, 0, 0);
-    m_rightLeader.setSelectedSensorPosition(0, 0, 0);
+    m_leftLeader.getSensorCollection().setQuadraturePosition(0, kTimeoutMs);
+    m_rightLeader.getSensorCollection().setQuadraturePosition(0, kTimeoutMs);
   }
 
   //Motion Magic
   public void motion_magic_start_config_drive(){
-    m_leftLeader.selectProfileSlot(DT_SLOT_DRIVE_MM, PID_PRIMARY);
     m_rightLeader.selectProfileSlot(DT_SLOT_DRIVE_MM, PID_PRIMARY);
-    m_leftLeader.configPeakOutputForward(1, kTimeoutMs); //TODO find values
-    m_leftLeader.configPeakOutputReverse(-1, kTimeoutMs);
+    m_leftLeader.follow(m_rightLeader, FollowerType.AuxOutput1);
+    m_auxPidTarget = m_rightLeader.getSelectedSensorPosition(PID_AUXILIARY);
+
+    m_rightLeader.configPeakOutputForward(1, kTimeoutMs); //TODO find values
+    m_rightLeader.configPeakOutputReverse(-1, kTimeoutMs);
   }
   public void motion_magic_end_config_drive(){
-    m_leftLeader.configPeakOutputForward(1, kTimeoutMs);
-    m_leftLeader.configPeakOutputReverse(-1, kTimeoutMs);
+    // To start motion magic we set the left side to follow the right, 
+    // call *.set() to get it out of follower mode.
+    m_rightLeader.set(ControlMode.PercentOutput, 0);
+    m_leftLeader.set(ControlMode.PercentOutput, 0);
   }
 
   public void motion_magic_start_config_turn(double degrees){
@@ -276,9 +327,9 @@ public class DriveTrain extends SubsystemBase {
   }
 
   public void motion_magic_end_config_turn(){
-
+    
   }
-  
+
   public int getLeftEncoderValue(){
     return m_leftLeader.getSelectedSensorPosition();
   }
@@ -291,37 +342,35 @@ public class DriveTrain extends SubsystemBase {
     m_leftLeader.config_kP(DT_SLOT_DRIVE_MM, kP);
     m_leftLeader.config_kI(DT_SLOT_DRIVE_MM, kI);
     m_leftLeader.config_kD(DT_SLOT_DRIVE_MM, kD);
-    m_leftLeader.config_kF(DT_SLOT_DRIVE_MM, kF);
+    //m_leftLeader.config_kF(DT_SLOT_DRIVE_MM, kF);
     
     m_rightLeader.config_kP(DT_SLOT_DRIVE_MM, kP);
     m_rightLeader.config_kI(DT_SLOT_DRIVE_MM, kI);
     m_rightLeader.config_kD(DT_SLOT_DRIVE_MM, kD);
-    m_rightLeader.config_kF(DT_SLOT_DRIVE_MM, kF);
+    //m_rightLeader.config_kF(DT_SLOT_DRIVE_MM, kF);
   }
 
   public void reset_turn_PID_values(double kP, double kI, double kD) {
     m_leftLeader.config_kP(DT_SLOT_TURN_MM, kP);
     m_leftLeader.config_kI(DT_SLOT_TURN_MM, kI);
     m_leftLeader.config_kD(DT_SLOT_TURN_MM, kD);
-    m_leftLeader.config_kF(DT_SLOT_TURN_MM, kF);
+    //m_leftLeader.config_kF(DT_SLOT_TURN_MM, kF);
 
     m_rightLeader.config_kP(DT_SLOT_TURN_MM, kP);
     m_rightLeader.config_kI(DT_SLOT_TURN_MM, kI);
     m_rightLeader.config_kD(DT_SLOT_TURN_MM, kD);
-    m_rightLeader.config_kF(DT_SLOT_TURN_MM, kF);
+   // m_rightLeader.config_kF(DT_SLOT_TURN_MM, kF);
 
   }
 
   public boolean motionMagicDrive(double target_position) {
     double tolerance = 10;
     
-    m_leftLeader.set(ControlMode.MotionMagic, target_position);
-		m_rightLeader.set(ControlMode.MotionMagic, target_position);
+    m_rightLeader.set(ControlMode.MotionMagic, target_position, DemandType.AuxPID, m_auxPidTarget);
 
-		double currentPos_L = m_leftLeader.getSelectedSensorPosition();
 		double currentPos_R = m_rightLeader.getSelectedSensorPosition();
 
-		return Math.abs(currentPos_L - target_position) < tolerance && (currentPos_R + target_position) < tolerance;
+		return Math.abs(currentPos_R - target_position)< tolerance;
   }
 
   public boolean motionMagicTurn(int arc_in_ticks){
@@ -374,8 +423,5 @@ public class DriveTrain extends SubsystemBase {
       setHighGear();
       m_IsLowGear = true;
     }
-
-    SmartDashboard.putBoolean("Low Gear", m_IsLowGear);
-    SmartDashboard.putNumber("Current Speed", currentSpeed);
   }
 }
