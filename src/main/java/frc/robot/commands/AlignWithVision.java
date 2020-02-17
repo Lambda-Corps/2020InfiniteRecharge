@@ -7,6 +7,8 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.DriveTrain;
@@ -21,6 +23,8 @@ public class AlignWithVision extends CommandBase {
   private double m_targetArea = 2.1;
   private double m_driveKP = 0.80;
 
+  // Network Table Entries used for Tuning
+  NetworkTableEntry m_kpSteer, m_minTA, m_drive_kp;
   /**
    * Creates a new AlignWithVision.
    */
@@ -30,21 +34,17 @@ public class AlignWithVision extends CommandBase {
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(m_DriveTrain, m_vision);
 
-    SmartDashboard.putNumber("Steering KP", 0.055);  // TODO -- Tune KPs on carpet
-    SmartDashboard.putNumber("min TA", 2.1);
-    SmartDashboard.putNumber("Driving KP", 0.80);
+    m_kpSteer = Shuffleboard.getTab("VisionAlign").add("Steering KP", 0.055).getEntry();
+    m_minTA = Shuffleboard.getTab("VisionAlign").add("min TA", 2.1).getEntry();
+    m_drive_kp = Shuffleboard.getTab("VisionAlign").add("Driving KP", 0.8).getEntry();
   }
 
   // Called when the command is initially scheduled.S
   @Override
   public void initialize() {
-    m_steeringKP = SmartDashboard.getNumber("Steering KP", 0.0);
-    m_targetArea = SmartDashboard.getNumber("min TA", 0.0);
-    m_driveKP = SmartDashboard.getNumber("Driving KP", 0.0);
-
-    SmartDashboard.putNumber("Left", 10000);
-    SmartDashboard.putNumber("Right", 10000);
-
+    m_steeringKP = m_kpSteer.getDouble(0);
+    m_targetArea = m_minTA.getDouble(0);
+    m_driveKP = m_drive_kp.getDouble(0);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -55,8 +55,9 @@ public class AlignWithVision extends CommandBase {
     SmartDashboard.putNumber("target area", m_vision.getTA());
 
     // m_DriveTrain.teleop_drive(left, right); // Drive until the target is at desired distance
-    SmartDashboard.putNumber("Left", left);
-    SmartDashboard.putNumber("Right", right);
+    Shuffleboard.getTab("VisionAlign").add("left calc", left).getEntry().forceSetDouble(left);
+    Shuffleboard.getTab("VisionAlign").add("right calc", right).getEntry().forceSetDouble(right);
+   
     if (m_vision.isTargetValid()) {
       if (m_vision.getTA() >= m_targetArea) {
         left = 0;

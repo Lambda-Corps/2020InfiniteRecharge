@@ -21,10 +21,10 @@ public class DriveMM extends CommandBase {
   public int count_ok;
   private double m_start_time;
   public final ShuffleboardTab driveMMTab;
-  private double m_drive_kP, m_kF, m_kI, m_kD;
-  private NetworkTableEntry m_drivekPEntry, m_kFEntry, m_kIEntry, m_kDEntry, m_toleranceEntry, m_targetPosEntry, m_targetMultEntry, m_iterationEntry, m_drivedurationEntry, m_countokEntry;
+  private double m_drive_kP, m_kI, m_kD;
+  private NetworkTableEntry m_drivekPEntry, m_kIEntry, m_kDEntry, m_targetPosEntry, m_iterationEntry, m_drivedurationEntry;
   //the number of times motion magic is on target before the command finishes
-   int STABLE_ITERATIONS_BEFORE_FINISHED = 5; //TODO tune this & make final again
+   int STABLE_ITERATIONS_BEFORE_FINISHED = 5;
   /**
    * Creates a new DriveMM.
    */
@@ -34,14 +34,13 @@ public class DriveMM extends CommandBase {
     m_drivekPEntry = driveMMTab.add("kP_drive", 0 ).withPosition(1, 0).getEntry();
     m_kIEntry = driveMMTab.add("kI", 0 ).withPosition(2, 0).getEntry();
     m_kDEntry = driveMMTab.add("kD", 0 ).withPosition(3, 0).getEntry();
-    m_kFEntry = driveMMTab.add("kF", 0 ).withPosition(0, 0).getEntry();
+    //m_kFEntry = driveMMTab.add("kF", 0 ).withPosition(0, 0).getEntry();
     m_iterationEntry = driveMMTab.add("stable iteration before finishing", 5 ).withPosition(0, 1).getEntry();
     m_targetPosEntry = driveMMTab.add("target position", 0).withPosition(4, 0).getEntry();
    // m_targetMultEntry = driveMMTab.add("target multiplier", 0).withPosition(5, 0).getEntry();
     driveMMTab.addNumber("Left Encoder", m_drivetrain::getLeftEncoderValue).withPosition(1, 1);
     driveMMTab.addNumber("Right Encoder", m_drivetrain::getRightEncoderValue).withPosition(2,1);
     m_drivedurationEntry = driveMMTab.add("drive duration", 0).withPosition(6, 0).getEntry();
-    m_countokEntry = driveMMTab.add("count_ok", 0).getEntry();
   
     addRequirements(m_drivetrain);
     //super("DriveMM", 5);
@@ -53,7 +52,7 @@ public class DriveMM extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_kF = m_kFEntry.getDouble(0.17785118219749652294853963838665);
+    //m_kF = m_kFEntry.getDouble(0.17785118219749652294853963838665);
     m_drive_kP = m_drivekPEntry.getDouble(0.0);
     m_kI =m_kIEntry.getDouble(0.0);
     m_kD = m_kDEntry.getDouble(0.0);

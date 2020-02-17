@@ -24,20 +24,18 @@ import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpiutil.math.MathUtil;
-import frc.robot.Constants;
+
 public class DriveTrain extends SubsystemBase {
   private double m_quickStopThreshold = .2;
   private double m_quickStopAlpha = .1;
   private double m_quickStopAccumulator;
-  private double m_deadband = .1; // TODO, tune this deadband to actually work with robot
+  private double m_deadband = .1;
 
   private final TalonSRX m_rightLeader, m_rightFollower;
   private final TalonSRX m_leftLeader, m_leftFollower;
   private final DoubleSolenoid m_gearbox;
 
   private static final int kTimeoutMs = 5;
-
-  private boolean m_IsLowGear;
 
   private boolean m_isPIDCorrecting;
   private int m_auxPidTarget;
@@ -82,7 +80,8 @@ public class DriveTrain extends SubsystemBase {
 
     m_gearbox = new DoubleSolenoid(GEARBOX_SOLENOID_A, GEARBOX_SOLENOID_B);
     setLowGear();
-    m_IsLowGear = true;
+
+    // Talon Speed Modifiers
 
     		// Set up Motion Magic
 		// Set the minimums for forward and back
@@ -305,7 +304,7 @@ public class DriveTrain extends SubsystemBase {
     m_leftLeader.follow(m_rightLeader, FollowerType.AuxOutput1);
     m_auxPidTarget = m_rightLeader.getSelectedSensorPosition(PID_AUXILIARY);
 
-    m_rightLeader.configPeakOutputForward(1, kTimeoutMs); //TODO find values
+    m_rightLeader.configPeakOutputForward(1, kTimeoutMs);
     m_rightLeader.configPeakOutputReverse(-1, kTimeoutMs);
   }
   public void motion_magic_end_config_drive(){
@@ -416,12 +415,15 @@ public class DriveTrain extends SubsystemBase {
     if((currentSpeed > UP_SHIFT_SPEED) && (solenoidPosition == Value.kForward)){
       //Low to High
       setLowGear();
-      m_IsLowGear = false;
     }
     else if((currentSpeed < DOWN_SHIFT_SPEED) && (solenoidPosition == Value.kReverse)){
       //High to Low
       setHighGear();
-      m_IsLowGear = true;
     }
+  }
+
+  @SuppressWarnings("unused")
+  private boolean isLowGear(){
+    return (m_gearbox.get() == DoubleSolenoid.Value.kReverse);
   }
 }
