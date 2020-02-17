@@ -50,6 +50,7 @@ public class DriveTrain extends SubsystemBase {
     m_rightLeader = new TalonSRX(RIGHT_TALON_LEADER);
     m_rightLeader.configFactoryDefault();
     m_rightLeader.setNeutralMode(NeutralMode.Brake);
+    m_rightLeader.setSensorPhase(true);
     m_rightFollower = new TalonSRX(RIGHT_TALON_FOLLOWER);
     m_rightFollower.configFactoryDefault();
     m_rightFollower.setNeutralMode(NeutralMode.Brake);
@@ -59,6 +60,7 @@ public class DriveTrain extends SubsystemBase {
     m_leftLeader  = new TalonSRX(LEFT_TALON_LEADER);
     m_leftLeader.configFactoryDefault();
     m_leftLeader.setNeutralMode(NeutralMode.Brake);
+    m_leftLeader.setSensorPhase(true);
     m_leftLeader.setInverted(true);
     m_leftFollower = new TalonSRX(LEFT_TALON_FOLLOWER);
     m_leftFollower.configFactoryDefault();
