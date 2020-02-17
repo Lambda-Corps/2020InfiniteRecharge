@@ -125,8 +125,22 @@ public class DriveTrain extends SubsystemBase {
     m_rightLeader.setSelectedSensorPosition(0, kPIDLoopIdx, kTimeoutMs);
   }
 
+  private double normalize(double speed) {
+    if (speed > 1) {
+      speed = 1;
+    } else if (speed < -1) {
+      speed = -1;
+    }
+    if (speed >= CONTROLLER_DEADBAND_NEGATIVE && speed <= CONTROLLER_DEADBAND_POSOTIVE) {
+      speed = 0;
+    }
+    return speed;
+  }
+
   public void teleop_drive(double left, double right){
-    curvature_drive_imp(left, right, (right == 0) ? true : false);
+    left = normalize(left);
+    right = normalize(right);
+    curvature_drive_imp(left, right, (left == 0) ? true : false);
     autoShiftGears();
   }
 
