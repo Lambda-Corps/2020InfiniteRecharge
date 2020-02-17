@@ -18,7 +18,6 @@ import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
-import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -34,7 +33,7 @@ public class Climber extends SubsystemBase {
   private final TalonSRX m_motor;
 
   // Working variables.
-  private boolean emergencyOff = false;
+  //private boolean emergencyOff = false;
 
   /**
    * Represents the climber of Team 1895's robot. It handles the raising,

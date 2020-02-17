@@ -22,8 +22,8 @@ public class TurnMM extends CommandBase {
   private double m_start_time;
   int STABLE_ITERATIONS_BEFORE_FINISHED = 5;
   public final ShuffleboardTab turnMMTab;
-  private double m_turn_kP, m_kF, m_kI, m_kD;
-  private NetworkTableEntry m_turnkPEntry, m_kFEntry, m_kIEntry, m_kDEntry, m_arclengthEntry, m_iterationEntry, m_drivedurationEntry, m_countokEntry;
+  private double m_turn_kP, m_kI, m_kD;
+  private NetworkTableEntry m_turnkPEntry, m_kIEntry, m_kDEntry, m_arclengthEntry, m_iterationEntry, m_drivedurationEntry, m_countokEntry;
   /**
    * Creates a new TurnMM.
    */
@@ -34,7 +34,7 @@ public class TurnMM extends CommandBase {
     m_turnkPEntry = turnMMTab.add("kP_turn", 0 ).withPosition(1, 0).getEntry();
     m_kIEntry = turnMMTab.add("kI", 0 ).withPosition(2, 0).getEntry();
     m_kDEntry = turnMMTab.add("kD", 0 ).withPosition(3, 0).getEntry();
-    m_kFEntry = turnMMTab.add("kF", 0 ).withPosition(0, 0).getEntry();
+    //m_kFEntry = turnMMTab.add("kF", 0 ).withPosition(0, 0).getEntry();
     m_iterationEntry = turnMMTab.add("stable iteration before finishing", 5 ).withPosition(0, 1).getEntry();
     m_arclengthEntry = turnMMTab.add("target position", 0).withPosition(4, 0).getEntry();
     turnMMTab.addNumber("Left Encoder", m_drivetrain::getLeftEncoderValue).withPosition(1, 1);
@@ -64,7 +64,7 @@ public class TurnMM extends CommandBase {
     count_ok = 0;
     m_drivetrain.reset_drivetrain_encoders();
 
-    m_kF = m_kFEntry.getDouble(0.17785118219749652294853963838665);
+    //m_kF = m_kFEntry.getDouble(0.17785118219749652294853963838665);
     m_turn_kP = m_turnkPEntry.getDouble(0.0);
     m_kI = m_kIEntry.getDouble(0.0);
     m_kD = m_kDEntry.getDouble(0.0);

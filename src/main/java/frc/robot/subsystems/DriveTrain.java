@@ -24,7 +24,7 @@ public class DriveTrain extends SubsystemBase {
   private double m_quickStopThreshold = .2;
   private double m_quickStopAlpha = .1;
   private double m_quickStopAccumulator;
-  private double m_deadband = .1; // TODO, tune this deadband to actually work with robot
+  private double m_deadband = .1;
 
   private final TalonSRX m_rightLeader, m_rightFollower;
   private final TalonSRX m_leftLeader, m_leftFollower;
@@ -35,25 +35,9 @@ public class DriveTrain extends SubsystemBase {
   private static final double kI = 0;
   private static final double kD = 0;
 
-  private static final double kF_turn_small = 0;
-  private static final double kP_turn_small = 0;
-  private static final double kI_turn_small = 0;
-  private static final double kD_turn_small = 0;
-
-  private static final double kF_turn_big = 0;
-  private static final double kP_turn_big = 0;
-  private static final double kI_turn_big = 0;
-  private static final double kD_turn_big = 0;
-
-
   private static final int kPIDLoopIdx = 0;
   private static final int kTimeoutMs = 5;
   private static final int kSlotIdx = 0;
-  private static double m_tolerance = 10;
-  private double m_LeftTalonModifier;
-  private double m_rightTalonModifier;
-
-  private boolean m_IsLowGear;
 
   //private final AHRS navx;
   /**
@@ -97,8 +81,7 @@ public class DriveTrain extends SubsystemBase {
     setLowGear();
 
     // Talon Speed Modifiers
-    m_LeftTalonModifier = SmartDashboard.getNumber("Decrese Right Speed by", 0);
-    m_rightTalonModifier = SmartDashboard.getNumber("Decrese Left Speed by", 0);
+
     		// Set up Motion Magic
 		// nominal output forward (0)
 		m_leftLeader.configNominalOutputForward(0, kTimeoutMs);
@@ -256,7 +239,7 @@ public class DriveTrain extends SubsystemBase {
   public void motion_magic_start_config_drive(){
     m_leftLeader.selectProfileSlot(DT_SLOT_DRIVE_MM, PID_PRIMARY);
     m_rightLeader.selectProfileSlot(DT_SLOT_DRIVE_MM, PID_PRIMARY);
-    m_leftLeader.configPeakOutputForward(1, kTimeoutMs); //TODO find values
+    m_leftLeader.configPeakOutputForward(1, kTimeoutMs);
     m_leftLeader.configPeakOutputReverse(-1, kTimeoutMs);
   }
   public void motion_magic_end_config_drive(){
@@ -367,15 +350,15 @@ public class DriveTrain extends SubsystemBase {
     if((currentSpeed > UP_SHIFT_SPEED) && (solenoidPosition == Value.kForward)){
       //Low to High
       setLowGear();
-      m_IsLowGear = false;
     }
     else if((currentSpeed < DOWN_SHIFT_SPEED) && (solenoidPosition == Value.kReverse)){
       //High to Low
       setHighGear();
-      m_IsLowGear = true;
     }
+  }
 
-    SmartDashboard.putBoolean("Low Gear", m_IsLowGear);
-    SmartDashboard.putNumber("Current Speed", currentSpeed);
+  @SuppressWarnings("unused")
+  private boolean isLowGear(){
+    return (m_gearbox.get() == DoubleSolenoid.Value.kReverse);
   }
 }
