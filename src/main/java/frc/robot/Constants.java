@@ -62,8 +62,9 @@ public final class Constants {
      * Not all set of Gains are used in this project and may be removed as desired.
      * 
 	 * 	                                    			  kP   kI   kD   kF               Iz    PeakOut */
-	public final static Gains kGains_DriveMM = new Gains( 0.1, 0.0,  0.0, 0.0,            100,  0.50 );
-	public final static Gains kGains_TurnMM = new Gains( 2.0, 0.0,  4.0, 0.0,            200,  1.00 );
+	public final static Gains kGains_DriveMM = new Gains( 4.75, 0.0, 20, /*0.17785*/ 0,         100,  1.00 );
+    public final static Gains kGains_TurnMM_small = new Gains( 4.75, 0.0,  20, 0.17785,   200,  1.00 );
+    public final static Gains kGains_TurnMM_big   = new Gains( 4.75, 0.0,  20, 0.17785,   200,  1.00 );
 	public final static Gains kGains_Shooter = new Gains( 0.1, 0.0, 20.0, 1023.0/6800.0,  300,  0.50 );
 	public final static Gains kGains_MotProf = new Gains( 1.0, 0.0,  0.0, 1023.0/3200.0,  400,  1.00 );
 	

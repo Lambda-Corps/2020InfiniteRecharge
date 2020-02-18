@@ -10,6 +10,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 //import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 //import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.calibration.PIDTuningCommand;
@@ -133,7 +134,10 @@ public class RobotContainer {
   private void setupDriveMMShuffleboard(){
     // First, assign a local variable the Tab that we are going to use
     // for pid tuning in Shuffleboard
-    Shuffleboard.getTab("Drive MM Testing").add(new DriveMM(m_drive_train, 0)).withPosition(0, 2);
+    //Shuffleboard.getTab("Drive MM").add(new DriveMM(m_drive_train, 100)).withPosition(0, 0);
+    // Shuffleboard.getTab("Drive MM").add(new DriveMM(m_drive_train, -100)).withPosition(2, 0);
+    //SmartDashboard.putData("Drive 100", new DriveMM(m_drive_train, 100));
+    //SmartDashboard.putData("Drive -100", new DriveMM(m_drive_train, -100));
 
   }
 }

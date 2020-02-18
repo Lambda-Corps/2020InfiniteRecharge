@@ -30,14 +30,8 @@ public class DriveTrain extends SubsystemBase {
   private final TalonSRX m_leftLeader, m_leftFollower;
   private final DoubleSolenoid m_gearbox;
 
-  private static final double kF = 0;
-  private static final double kP_drive = 0;
-  private static final double kI = 0;
-  private static final double kD = 0;
-
   private static final int kPIDLoopIdx = 0;
   private static final int kTimeoutMs = 5;
-  private static final int kSlotIdx = 0;
 
   //private final AHRS navx;
   /**
@@ -98,17 +92,30 @@ public class DriveTrain extends SubsystemBase {
 		m_leftLeader.configPeakOutputReverse(OPEN_LOOP_PEAK_OUTPUT_B, kTimeoutMs);
 		m_rightLeader.configPeakOutputReverse(OPEN_LOOP_PEAK_OUTPUT_B, kTimeoutMs);
 		// select profile slot
-		m_leftLeader.selectProfileSlot(kSlotIdx, kPIDLoopIdx);
-		m_rightLeader.selectProfileSlot(kSlotIdx, kPIDLoopIdx);
-		// config pidf values
-		m_leftLeader.config_kF(kSlotIdx, kF, kTimeoutMs);
-		m_leftLeader.config_kP(kSlotIdx, kP_drive, kTimeoutMs);
-		m_leftLeader.config_kI(kSlotIdx, kI, kTimeoutMs);
-		m_leftLeader.config_kD(kSlotIdx, kD, kTimeoutMs);
-		m_rightLeader.config_kF(kSlotIdx, kF, kTimeoutMs);
-		m_rightLeader.config_kP(kSlotIdx, kP_drive, kTimeoutMs);
-		m_rightLeader.config_kI(kSlotIdx, kI, kTimeoutMs);
-		m_rightLeader.config_kD(kSlotIdx, kD, kTimeoutMs);
+		m_leftLeader.selectProfileSlot(DT_SLOT_DRIVE_MM, kPIDLoopIdx);
+    m_rightLeader.selectProfileSlot(DT_SLOT_DRIVE_MM, kPIDLoopIdx);
+    
+    // Setup MotionMagic pid values for Drive and then Turn
+		// config DriveMM pidf values
+		m_leftLeader.config_kF(DT_SLOT_DRIVE_MM, kGains_DriveMM.kF, kTimeoutMs);
+		m_leftLeader.config_kP(DT_SLOT_DRIVE_MM, kGains_DriveMM.kP, kTimeoutMs);
+		m_leftLeader.config_kI(DT_SLOT_DRIVE_MM, kGains_DriveMM.kI, kTimeoutMs);
+		m_leftLeader.config_kD(DT_SLOT_DRIVE_MM, kGains_DriveMM.kD, kTimeoutMs);
+		m_rightLeader.config_kF(DT_SLOT_DRIVE_MM, kGains_DriveMM.kF, kTimeoutMs);
+		m_rightLeader.config_kP(DT_SLOT_DRIVE_MM, kGains_DriveMM.kP, kTimeoutMs);
+		m_rightLeader.config_kI(DT_SLOT_DRIVE_MM, kGains_DriveMM.kI, kTimeoutMs);
+    m_rightLeader.config_kD(DT_SLOT_DRIVE_MM, kGains_DriveMM.kD, kTimeoutMs);
+    
+    // config TurnMM pidf values, default to turns > 45 degrees
+		m_leftLeader.config_kF(DT_SLOT_TURN_MM, kGains_TurnMM_big.kF, kTimeoutMs);
+		m_leftLeader.config_kP(DT_SLOT_TURN_MM, kGains_TurnMM_big.kP, kTimeoutMs);
+		m_leftLeader.config_kI(DT_SLOT_TURN_MM, kGains_TurnMM_big.kI, kTimeoutMs);
+		m_leftLeader.config_kD(DT_SLOT_TURN_MM, kGains_TurnMM_big.kD, kTimeoutMs);
+		m_rightLeader.config_kF(DT_SLOT_TURN_MM, kGains_TurnMM_big.kF, kTimeoutMs);
+		m_rightLeader.config_kP(DT_SLOT_TURN_MM, kGains_TurnMM_big.kP, kTimeoutMs);
+		m_rightLeader.config_kI(DT_SLOT_TURN_MM, kGains_TurnMM_big.kI, kTimeoutMs);
+    m_rightLeader.config_kD(DT_SLOT_TURN_MM, kGains_TurnMM_big.kD, kTimeoutMs);
+    
 		// config cruise velocity, acceleration
     m_leftLeader.configMotionCruiseVelocity(3000, kTimeoutMs); 
 		m_leftLeader.configMotionAcceleration(1500, kTimeoutMs); // cruise velocity / 2, so it will take 2 seconds
@@ -235,6 +242,8 @@ public class DriveTrain extends SubsystemBase {
   public void periodic() {
     SmartDashboard.putNumber("Left Velocity", m_leftLeader.getSelectedSensorVelocity());
     SmartDashboard.putNumber("Right Velocity", m_rightLeader.getSelectedSensorVelocity());
+    SmartDashboard.putNumber("Left Encoder", m_leftLeader.getSelectedSensorPosition());
+    SmartDashboard.putNumber("Right Encoder", m_rightLeader.getSelectedSensorPosition());
     // This method will be called once per scheduler run
   }
 
@@ -258,15 +267,22 @@ public class DriveTrain extends SubsystemBase {
   }
 
   //Motion Magic
-  public void motion_magic_start_config_drive(){
+  public void motion_magic_start_config_drive(boolean isForward){
+    reset_drivetrain_encoders();
+    // Setup the Talon to use Drive MM slots
     m_leftLeader.selectProfileSlot(DT_SLOT_DRIVE_MM, PID_PRIMARY);
     m_rightLeader.selectProfileSlot(DT_SLOT_DRIVE_MM, PID_PRIMARY);
-    m_leftLeader.configPeakOutputForward(1, kTimeoutMs);
-    m_leftLeader.configPeakOutputReverse(-1, kTimeoutMs);
+
+    if( isForward ){
+      m_leftLeader.config_kF(DT_SLOT_DRIVE_MM, kGains_DriveMM.kF);
+      m_rightLeader.config_kF(DT_SLOT_DRIVE_MM, kGains_DriveMM.kF);
+    }else {
+      m_leftLeader.config_kF(DT_SLOT_DRIVE_MM, kGains_DriveMM.kF * -1);
+      m_rightLeader.config_kF(DT_SLOT_DRIVE_MM, kGains_DriveMM.kF * -1);
+    }
   }
   public void motion_magic_end_config_drive(){
-    m_leftLeader.configPeakOutputForward(1, kTimeoutMs);
-    m_leftLeader.configPeakOutputReverse(-1, kTimeoutMs);
+    
   }
 
   public void motion_magic_start_config_turn(double degrees){
@@ -296,24 +312,20 @@ public class DriveTrain extends SubsystemBase {
     m_leftLeader.config_kP(DT_SLOT_DRIVE_MM, kP);
     m_leftLeader.config_kI(DT_SLOT_DRIVE_MM, kI);
     m_leftLeader.config_kD(DT_SLOT_DRIVE_MM, kD);
-    m_leftLeader.config_kF(DT_SLOT_DRIVE_MM, kF);
     
     m_rightLeader.config_kP(DT_SLOT_DRIVE_MM, kP);
     m_rightLeader.config_kI(DT_SLOT_DRIVE_MM, kI);
     m_rightLeader.config_kD(DT_SLOT_DRIVE_MM, kD);
-    m_rightLeader.config_kF(DT_SLOT_DRIVE_MM, kF);
   }
 
   public void reset_turn_PID_values(double kP, double kI, double kD) {
     m_leftLeader.config_kP(DT_SLOT_TURN_MM, kP);
     m_leftLeader.config_kI(DT_SLOT_TURN_MM, kI);
     m_leftLeader.config_kD(DT_SLOT_TURN_MM, kD);
-    m_leftLeader.config_kF(DT_SLOT_TURN_MM, kF);
 
     m_rightLeader.config_kP(DT_SLOT_TURN_MM, kP);
     m_rightLeader.config_kI(DT_SLOT_TURN_MM, kI);
     m_rightLeader.config_kD(DT_SLOT_TURN_MM, kD);
-    m_rightLeader.config_kF(DT_SLOT_TURN_MM, kF);
 
   }
 
@@ -326,7 +338,7 @@ public class DriveTrain extends SubsystemBase {
 		double currentPos_L = m_leftLeader.getSelectedSensorPosition();
 		double currentPos_R = m_rightLeader.getSelectedSensorPosition();
 
-		return Math.abs(currentPos_L - target_position) < tolerance && (currentPos_R + target_position) < tolerance;
+		return Math.abs(currentPos_L - target_position) < tolerance && (currentPos_R - target_position) < tolerance;
   }
 
   public boolean motionMagicTurn(int arc_in_ticks){
