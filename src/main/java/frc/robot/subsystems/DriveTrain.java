@@ -14,9 +14,11 @@ import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.InvertType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
+import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpiutil.math.MathUtil;
@@ -26,9 +28,10 @@ public class DriveTrain extends SubsystemBase {
   private double m_quickStopAccumulator;
   private double m_deadband = .1;
 
-  private final TalonSRX m_rightLeader, m_rightFollower;
-  private final TalonSRX m_leftLeader, m_leftFollower;
+  private final WPI_TalonSRX m_rightLeader, m_rightFollower;
+  private final WPI_TalonSRX m_leftLeader, m_leftFollower;
   private final DoubleSolenoid m_gearbox;
+  private final DifferentialDrive m_safety_drive;
 
   private static final int kPIDLoopIdx = 0;
   private static final int kTimeoutMs = 5;
@@ -41,22 +44,22 @@ public class DriveTrain extends SubsystemBase {
     //navx = new AHRS();
     // Finish with phoenix tuner to determine inversion, sensor phase
     // and all the rest of the Bring-Up steps for the Talon
-    m_rightLeader = new TalonSRX(RIGHT_TALON_LEADER);
+    m_rightLeader = new WPI_TalonSRX(RIGHT_TALON_LEADER);
     m_rightLeader.configFactoryDefault();
     m_rightLeader.setNeutralMode(NeutralMode.Brake);
     m_rightLeader.setSensorPhase(true);
-    m_rightFollower = new TalonSRX(RIGHT_TALON_FOLLOWER);
+    m_rightFollower = new WPI_TalonSRX(RIGHT_TALON_FOLLOWER);
     m_rightFollower.configFactoryDefault();
     m_rightFollower.setNeutralMode(NeutralMode.Brake);
     m_rightFollower.follow(m_rightLeader);
 
     // Phoenix Tuner showed left side needs to be inverted
-    m_leftLeader  = new TalonSRX(LEFT_TALON_LEADER);
+    m_leftLeader  = new WPI_TalonSRX(LEFT_TALON_LEADER);
     m_leftLeader.configFactoryDefault();
     m_leftLeader.setNeutralMode(NeutralMode.Brake);
     m_leftLeader.setSensorPhase(true);
     m_leftLeader.setInverted(true);
-    m_leftFollower = new TalonSRX(LEFT_TALON_FOLLOWER);
+    m_leftFollower = new WPI_TalonSRX(LEFT_TALON_FOLLOWER);
     m_leftFollower.configFactoryDefault();
     m_leftFollower.setNeutralMode(NeutralMode.Brake);
     m_leftFollower.setInverted(InvertType.FollowMaster);
@@ -132,6 +135,11 @@ public class DriveTrain extends SubsystemBase {
 		// reset sensors
 		m_leftLeader.setSelectedSensorPosition(0, kPIDLoopIdx, kTimeoutMs);
     m_rightLeader.setSelectedSensorPosition(0, kPIDLoopIdx, kTimeoutMs);
+
+    // We have observed a couple times where the robot loses control and continues without operator
+    // input, changed the TalonSRX objects to be WPI_Talons so we can use the differential drive.
+    // We aren't going to actually drive with it.  We are just going to use it for the Watchdog timer.
+    m_safety_drive = new DifferentialDrive(m_leftLeader, m_rightLeader);
   }
 
   private double normalize(double speed) {
@@ -151,6 +159,7 @@ public class DriveTrain extends SubsystemBase {
     right = normalize(right);
     curvature_drive_imp(left, right, (left == 0) ? true : false);
     autoShiftGears();
+    m_safety_drive.feed();
   }
 
   /* private void tank_drive_imp(double left_speed, double right_speed){
