@@ -24,7 +24,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class Climber extends SubsystemBase {
   // Settings
   private final double RAISE_SPEED = 1.0;
-  private final double LOWER_SPEED = 1.0;
+  private final double LOWER_SPEED = -1.0;
 
   // Components of the climber.
   private final DoubleSolenoid m_solenoid;
@@ -46,7 +46,7 @@ public class Climber extends SubsystemBase {
     this.m_motor = new TalonSRX(CLIMBER_MOTOR);
     this.m_solenoid = new DoubleSolenoid(CLIMBER_CHANNEL_A, CLIMBER_CHANNEL_B);
 
-    this.m_motor.setInverted(true); // Positive Voltage = Climber Raise
+    this.m_motor.setInverted(false); // Positive Voltage = Climber Raise
 
     Shuffleboard.getTab("Climber").add("top switch", m_toplimitswitch);
     Shuffleboard.getTab("Climber").add("bottom switch", m_bottomlimitswitch);
@@ -122,14 +122,14 @@ public class Climber extends SubsystemBase {
   public void extendLockingPistons() {
     this.stopMotor(); // Never allow the motor to be running while locking pistons are extended.
 
-    this.m_solenoid.set(DoubleSolenoid.Value.kForward);
+    this.m_solenoid.set(DoubleSolenoid.Value.kReverse);
   }
 
   /**
    * Commands the locking pistons to retract, allowing the climber to move freely.
    */
   public void retractLockingPistons() {
-    this.m_solenoid.set(DoubleSolenoid.Value.kReverse);
+    this.m_solenoid.set(DoubleSolenoid.Value.kForward);
   }
 
   @Override
