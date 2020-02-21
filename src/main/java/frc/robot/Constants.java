@@ -85,4 +85,8 @@ public final class Constants {
     public static final int DT_SLOT_TURN_MM = SLOT_2;
     public static final int DT_SLOT_MOTION_PROFILE = SLOT_3;
 
+    //Color wheel
+    public static final int SPINNING_THREE_TIMES_SPEED = 1;
+    public static final int SPINNING_THREE_TIMES_COUNTER = 450;
+    public static final double SPINNING_TO_A_COLOR = 0.5;
 }
