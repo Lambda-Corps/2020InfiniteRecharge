@@ -6,7 +6,7 @@
 /*----------------------------------------------------------------------------*/
 
 package frc.robot;
-
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -23,7 +23,10 @@ import frc.robot.commands.DriveMM;
 import frc.robot.commands.Drive_Backwards;
 import frc.robot.commands.ExtendClimberSolenoid;
 import frc.robot.commands.RetractClimberSolenoid;
+import frc.robot.commands.Spin3Times;
+import frc.robot.commands.SpinToAColor;
 import frc.robot.subsystems.Climber;
+import frc.robot.subsystems.ColorWheel;
 import frc.robot.commands.EditTalonSpeeds;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.Vision;
@@ -48,12 +51,28 @@ public class RobotContainer {
   public JoystickButton driver_A;
   public JoystickButton driver_X;
 
+  private  ColorWheel m_cColorWheel;
+  private Spin3Times m_Spin3Times;
+  private SpinToAColor m_SpinToAColor;
+  //private DefaultIntakeCommand m_dDefaultIntakeCommand;
+  //private Intake m_Intake;
+
+
   /**
    * The container for the robot.  Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
     // Set the default commands for the subsystems
     m_drive_train.setDefaultCommand(new DefaultDriveTrainCommand(m_drive_train, m_driver_controller));
+
+    m_cColorWheel =new ColorWheel();
+    SmartDashboard.putData(new Spin3Times(m_cColorWheel));
+    SmartDashboard.putData(m_Spin3Times);
+
+    SmartDashboard.putData(new SpinToAColor(m_cColorWheel));
+    SmartDashboard.putData(m_SpinToAColor);
+
+    
 
     // Configure the button bindings
     // NOTE -- This should not be called until all the subsystems have been instantiated and the 

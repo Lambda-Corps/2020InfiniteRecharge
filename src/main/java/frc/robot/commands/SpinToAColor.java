@@ -9,42 +9,37 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.ColorWheel;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import static frc.robot.Constants.*;
 
 
-public class Spin3Times extends CommandBase {
+
+public class SpinToAColor extends CommandBase {
   /**
-   * Creates a new Spin3Times.
-  
+   * Creates a new SpinToAColor.
    */
-  private final ColorWheel m_subsystem;
-  private boolean isDone = false;
-  private double SpinThree = 450;
 
-  public Spin3Times(ColorWheel subsystem) {
+   private final ColorWheel m_subsystem;
+   private boolean ColorSet = false;
+
+  public SpinToAColor(ColorWheel subsystems) {
     // Use addRequirements() here to declare subsystem dependencies.
-    m_subsystem = subsystem;
-    addRequirements(subsystem);
-
+    m_subsystem = subsystems;
+    addRequirements(subsystems);
+    
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    this.isDone = false;
-    SpinThree = SPINNING_THREE_TIMES_COUNTER;
+    this.ColorSet = false;
+    
+    
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_subsystem.startSpinningThree();
-
-    if (SpinThree-- <= 0) {
-      this.isDone = true;
-
-    }
+    ColorSet = m_subsystem.SpinToColor();
+    
   }
 
   // Called once the command ends or is interrupted.
@@ -56,6 +51,6 @@ public class Spin3Times extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return this.isDone;
+    return this.ColorSet;
   }
 }
