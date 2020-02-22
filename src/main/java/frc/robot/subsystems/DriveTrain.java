@@ -13,15 +13,15 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.InvertType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpiutil.math.MathUtil;
+import frc.robot.ShuffleboardInfo;
 public class DriveTrain extends SubsystemBase {
   private double m_quickStopThreshold = .2;
   private double m_quickStopAlpha = .1;
@@ -36,11 +36,15 @@ public class DriveTrain extends SubsystemBase {
   private static final int kPIDLoopIdx = 0;
   private static final int kTimeoutMs = 5;
 
+  private final NetworkTableEntry m_low_gear_entry;
   //private final AHRS navx;
   /**
    * Creates a new DriveTrain.
    */
   public DriveTrain() {
+    // Get shuffleboard components
+    m_low_gear_entry = ShuffleboardInfo.getInstance().getDriverLowGearEntry();
+
     //navx = new AHRS();
     // Finish with phoenix tuner to determine inversion, sensor phase
     // and all the rest of the Bring-Up steps for the Talon
@@ -249,11 +253,13 @@ public class DriveTrain extends SubsystemBase {
 
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("Left Velocity", m_leftLeader.getSelectedSensorVelocity());
-    SmartDashboard.putNumber("Right Velocity", m_rightLeader.getSelectedSensorVelocity());
-    SmartDashboard.putNumber("Left Encoder", m_leftLeader.getSelectedSensorPosition());
-    SmartDashboard.putNumber("Right Encoder", m_rightLeader.getSelectedSensorPosition());
+    // SmartDashboard.putNumber("Left Velocity", m_leftLeader.getSelectedSensorVelocity());
+    // SmartDashboard.putNumber("Right Velocity", m_rightLeader.getSelectedSensorVelocity());
+    // SmartDashboard.putNumber("Left Encoder", m_leftLeader.getSelectedSensorPosition());
+    // SmartDashboard.putNumber("Right Encoder", m_rightLeader.getSelectedSensorPosition());
     // This method will be called once per scheduler run
+    m_low_gear_entry.forceSetBoolean(isLowGear());
+
   }
 
   public void stopMotors() {
