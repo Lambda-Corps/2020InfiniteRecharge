@@ -22,8 +22,8 @@ public class TurnMM extends CommandBase {
   private double m_start_time;
   int STABLE_ITERATIONS_BEFORE_FINISHED = 5;
   public final ShuffleboardTab turnMMTab;
-  private double m_turn_kP, m_kI, m_kD;
-  private NetworkTableEntry m_turnkPEntry, m_kIEntry, m_kDEntry, m_arclengthEntry, m_iterationEntry, m_drivedurationEntry, m_countokEntry;
+  // private double m_turn_kP, m_kI, m_kD;
+  // private NetworkTableEntry m_turnkPEntry, m_kIEntry, m_kDEntry, m_arclengthEntry, m_iterationEntry, m_drivedurationEntry, m_countokEntry, m_arclengthticksEntry;
   /**
    * Creates a new TurnMM.
    */
@@ -31,16 +31,17 @@ public class TurnMM extends CommandBase {
     m_drivetrain = driveTrain;
     addRequirements(m_drivetrain);
     turnMMTab = Shuffleboard.getTab("Turn MM Testing");
-    m_turnkPEntry = turnMMTab.add("kP_turn", 0 ).withPosition(1, 0).getEntry();
-    m_kIEntry = turnMMTab.add("kI", 0 ).withPosition(2, 0).getEntry();
-    m_kDEntry = turnMMTab.add("kD", 0 ).withPosition(3, 0).getEntry();
-    //m_kFEntry = turnMMTab.add("kF", 0 ).withPosition(0, 0).getEntry();
-    m_iterationEntry = turnMMTab.add("stable iteration before finishing", 5 ).withPosition(0, 1).getEntry();
-    m_arclengthEntry = turnMMTab.add("target position", 0).withPosition(4, 0).getEntry();
-    turnMMTab.addNumber("Left Encoder", m_drivetrain::getLeftEncoderValue).withPosition(1, 1);
-    turnMMTab.addNumber("Right Encoder", m_drivetrain::getRightEncoderValue).withPosition(2,1);
-    m_drivedurationEntry = turnMMTab.add("drive duration", 0).withPosition(6, 0).getEntry();
-    m_countokEntry = turnMMTab.add("count_ok", 0).getEntry();
+    // m_turnkPEntry = turnMMTab.add("kP_turn", 0 ).withPosition(1, 0).getEntry();
+    // m_kIEntry = turnMMTab.add("kI", 0 ).withPosition(2, 0).getEntry();
+    // m_kDEntry = turnMMTab.add("kD", 0 ).withPosition(3, 0).getEntry();
+    // //m_kFEntry = turnMMTab.add("kF", 0 ).withPosition(0, 0).getEntry();
+    // m_iterationEntry = turnMMTab.add("stable iteration before finishing", 5 ).withPosition(0, 1).getEntry();
+    // m_arclengthEntry = turnMMTab.add("target position", 0).withPosition(4, 0).getEntry();
+    // m_arclengthticksEntry = turnMMTab.add("target ticks", 0).getEntry();
+    // turnMMTab.addNumber("Left Encoder", m_drivetrain::getLeftEncoderValue).withPosition(1, 1);
+    // turnMMTab.addNumber("Right Encoder", m_drivetrain::getRightEncoderValue).withPosition(2,1);
+    // m_drivedurationEntry = turnMMTab.add("drive duration", 0).withPosition(6, 0).getEntry();
+    // m_countokEntry = turnMMTab.add("count_ok", 0).getEntry();
 
     this.m_arcLengthDegrees = angle;
 
@@ -50,6 +51,7 @@ public class TurnMM extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    m_drivetrain.disableMotorSafety();
     /*512 ticks per 1 rotation * 54/30 * 36/12 (gearing) = ~2764.8 ticks/1 wheel rotation (2765 is rounded)
       2765 ticks per 1 rotation / (pi * 6.3125 in (wheel diameter)) = 139.416 ticks per 1 inch
       Measured wheel base is 28 inches, so to figure out inches per degree of turning we take 
@@ -59,41 +61,44 @@ public class TurnMM extends CommandBase {
 
       ArcLength in ticks = ticks per inch * degrees per inch * degrees to turn
     */
-    m_arcLengthDegrees = m_arclengthEntry.getDouble(0);
-    m_arcLengthTicks = (int) (m_arcLengthDegrees * 139.416 * 0.2443);
+    // m_arcLengthDegrees = m_arclengthEntry.getDouble(0);
+    m_arcLengthTicks = (int) (m_arcLengthDegrees * 139.416 * 0.2465); 
+    // m_arclengthticksEntry.forceSetDouble(m_arcLengthTicks);
     count_ok = 0;
     m_drivetrain.reset_drivetrain_encoders();
 
     //m_kF = m_kFEntry.getDouble(0.17785118219749652294853963838665);
-    m_turn_kP = m_turnkPEntry.getDouble(0.0);
-    m_kI = m_kIEntry.getDouble(0.0);
-    m_kD = m_kDEntry.getDouble(0.0);
-    STABLE_ITERATIONS_BEFORE_FINISHED = (int) m_iterationEntry.getDouble(5.0);
-    m_start_time = Timer.getFPGATimestamp();
+    // m_turn_kP = m_turnkPEntry.getDouble(0.0);
+    // m_kI = m_kIEntry.getDouble(0.0);
+    // m_kD = m_kDEntry.getDouble(0.0);
+    // STABLE_ITERATIONS_BEFORE_FINISHED = (int) m_iterationEntry.getDouble(5.0);
+    // m_start_time = Timer.getFPGATimestamp();
     count_ok = 0;
     m_drivetrain.reset_drivetrain_encoders();
-    m_drivetrain.reset_turn_PID_values(m_turn_kP, m_kI, m_kD);
+    // m_drivetrain.reset_turn_PID_values(m_turn_kP, m_kI, m_kD);
     m_drivetrain.motion_magic_start_config_turn(m_arcLengthDegrees);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    m_drivetrain.feedWatchdog();
     if (m_drivetrain.motionMagicTurn(m_arcLengthTicks)){
       count_ok++;
     } else {
       count_ok = 0;
     }
-    m_countokEntry.setDouble(count_ok);
+    // m_countokEntry.setDouble(count_ok);
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
     m_drivetrain.motion_magic_end_config_turn();
-    double drive_duration = Timer.getFPGATimestamp() - m_start_time;
-    m_drivedurationEntry.setDouble(drive_duration);
+    // double drive_duration = Timer.getFPGATimestamp() - m_start_time;
+    // m_drivedurationEntry.setDouble(drive_duration);
     m_drivetrain.stopMotors();
+    m_drivetrain.enableMotorSafety();
   }
 
   // Returns true when the command should end.

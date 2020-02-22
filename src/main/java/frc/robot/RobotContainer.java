@@ -9,7 +9,9 @@ package frc.robot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 //import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 //import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -25,6 +27,9 @@ import frc.robot.commands.ExtendClimberSolenoid;
 import frc.robot.commands.RetractClimberSolenoid;
 import frc.robot.commands.Spin3Times;
 import frc.robot.commands.SpinToAColor;
+import frc.robot.commands.TurnMM;
+import frc.robot.commands.Autonomous.Pos1;
+import frc.robot.commands.Autonomous.*;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.ColorWheel;
 import frc.robot.commands.EditTalonSpeeds;
@@ -57,11 +62,17 @@ public class RobotContainer {
   //private DefaultIntakeCommand m_dDefaultIntakeCommand;
   //private Intake m_Intake;
 
+  private SendableChooser<Command> m_auto_chooser;
 
   /**
    * The container for the robot.  Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
+    m_auto_chooser = new SendableChooser<Command>();
+    m_auto_chooser.addOption("Position 1 Auto", new Pos1(m_drive_train));
+    m_auto_chooser.addOption("Positon 2 Auto", new Pos2_90(m_drive_train));
+    m_auto_chooser.addOption("Position 3 Auto", new Pos3_45(m_drive_train));
+    m_auto_chooser.addOption("Drive Off of the Initiation Line", new DriveOffLine(m_drive_train));
     // Set the default commands for the subsystems
     m_drive_train.setDefaultCommand(new DefaultDriveTrainCommand(m_drive_train, m_driver_controller));
 
@@ -105,6 +116,7 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // An ExampleCommand will run in autonomous
+    
     return null;
   }
 
@@ -118,10 +130,15 @@ public class RobotContainer {
     setupClimberShuffleBoard();
     setUpTalonSpeedCommand();
     setupDriveMMShuffleboard();
+    setupTurnMMShuffleboard();
+    SmartDashboard.putData("75", new DriveMM(m_drive_train, 75));
+    SmartDashboard.putData("125", new DriveMM(m_drive_train, 125));
+    SmartDashboard.putData("200", new DriveMM(m_drive_train, 200));
   }
 
   private void setupAutonomousShuffleboard(){
-
+    SmartDashboard.putData("Autonomous", new Pos1(m_drive_train));
+    Shuffleboard.getTab("Autonomous").add("Autonomous to Run", m_auto_chooser).withWidget(BuiltInWidgets.kComboBoxChooser);
   }
 
   private void setupPidTuningCommandShuffleboard(){
@@ -159,4 +176,9 @@ public class RobotContainer {
     //SmartDashboard.putData("Drive -100", new DriveMM(m_drive_train, -100));
 
   }
+  private void setupTurnMMShuffleboard(){
+    Shuffleboard.getTab("Turn MM Testing").add(new TurnMM(m_drive_train, 0));
+  }
+
+
 }

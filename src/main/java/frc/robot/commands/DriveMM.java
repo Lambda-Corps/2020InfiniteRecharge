@@ -53,6 +53,7 @@ public class DriveMM extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    m_drivetrain.disableMotorSafety();
     //m_kF = m_kFEntry.getDouble(0.17785118219749652294853963838665);
     // m_drive_kP = m_drivekPEntry.getDouble(0.0);
     // m_kI =m_kIEntry.getDouble(0.0);
@@ -75,6 +76,7 @@ public class DriveMM extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    m_drivetrain.feedWatchdog();
     if(m_drivetrain.motionMagicDrive(m_target_position_ticks)){
       count_ok++;
     } else {
@@ -90,6 +92,7 @@ public class DriveMM extends CommandBase {
     // double drive_duration = Timer.getFPGATimestamp() - m_start_time;
     // m_drivedurationEntry.setDouble(drive_duration);
     m_drivetrain.stopMotors();
+    m_drivetrain.enableMotorSafety();
   }
 
   // Returns true when the command should end.

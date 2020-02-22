@@ -9,6 +9,8 @@ package frc.robot.subsystems;
 
 import static frc.robot.Constants.*;
 
+import java.util.Currency;
+
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.InvertType;
@@ -104,11 +106,11 @@ public class DriveTrain extends SubsystemBase {
     
     // Setup MotionMagic pid values for Drive and then Turn
 		// config DriveMM pidf values
-		m_leftLeader.config_kF(DT_SLOT_DRIVE_MM, kGains_DriveMM.kF, kTimeoutMs);
+		m_leftLeader.config_kF(DT_SLOT_DRIVE_MM, 0.1778511821974965229, kTimeoutMs);
 		m_leftLeader.config_kP(DT_SLOT_DRIVE_MM, kGains_DriveMM.kP, kTimeoutMs);
 		m_leftLeader.config_kI(DT_SLOT_DRIVE_MM, kGains_DriveMM.kI, kTimeoutMs);
 		m_leftLeader.config_kD(DT_SLOT_DRIVE_MM, kGains_DriveMM.kD, kTimeoutMs);
-		m_rightLeader.config_kF(DT_SLOT_DRIVE_MM, kGains_DriveMM.kF, kTimeoutMs);
+		m_rightLeader.config_kF(DT_SLOT_DRIVE_MM, 0.18686069167072576716999, kTimeoutMs);
 		m_rightLeader.config_kP(DT_SLOT_DRIVE_MM, kGains_DriveMM.kP, kTimeoutMs);
 		m_rightLeader.config_kI(DT_SLOT_DRIVE_MM, kGains_DriveMM.kI, kTimeoutMs);
     m_rightLeader.config_kD(DT_SLOT_DRIVE_MM, kGains_DriveMM.kD, kTimeoutMs);
@@ -124,10 +126,10 @@ public class DriveTrain extends SubsystemBase {
     m_rightLeader.config_kD(DT_SLOT_TURN_MM, kGains_TurnMM_big.kD, kTimeoutMs);
     
 		// config cruise velocity, acceleration
-    m_leftLeader.configMotionCruiseVelocity(3000, kTimeoutMs); 
-		m_leftLeader.configMotionAcceleration(1500, kTimeoutMs); // cruise velocity / 2, so it will take 2 seconds
-		m_rightLeader.configMotionCruiseVelocity(3000, kTimeoutMs); 
-		m_rightLeader.configMotionAcceleration(1500, kTimeoutMs); // cruise velocity / 2, so it will take 2 seconds
+    m_leftLeader.configMotionCruiseVelocity(2100, kTimeoutMs); 
+    m_leftLeader.configMotionAcceleration(500, kTimeoutMs); // cruise velocity / 2, so it will take 2 seconds
+		m_rightLeader.configMotionCruiseVelocity(2100, kTimeoutMs); 
+		m_rightLeader.configMotionAcceleration(500, kTimeoutMs); // cruise velocity / 2, so it will take 2 seconds
 		
 
 		m_leftLeader.configAllowableClosedloopError(0, 10, 3);
@@ -309,10 +311,17 @@ public class DriveTrain extends SubsystemBase {
     }
     m_leftLeader.selectProfileSlot(DT_SLOT_TURN_MM, PID_PRIMARY);
     m_rightLeader.selectProfileSlot(DT_SLOT_TURN_MM, PID_PRIMARY);
+    m_leftLeader.configMotionCruiseVelocity(3000, kTimeoutMs);
+    m_leftLeader.configMotionAcceleration(3000, kTimeoutMs);
+    m_rightLeader.configMotionCruiseVelocity(3000, kTimeoutMs);
+    m_rightLeader.configMotionAcceleration(3000, kTimeoutMs);
   }
 
   public void motion_magic_end_config_turn(){
-
+    m_leftLeader.configMotionCruiseVelocity(3000, kTimeoutMs);
+    m_leftLeader.configMotionAcceleration(1500, kTimeoutMs);
+    m_rightLeader.configMotionCruiseVelocity(3000, kTimeoutMs);
+    m_rightLeader.configMotionAcceleration(1500, kTimeoutMs);
   }
   
   public int getLeftEncoderValue(){
@@ -362,10 +371,11 @@ public class DriveTrain extends SubsystemBase {
     m_leftLeader.set(ControlMode.MotionMagic, arc_in_ticks);
 		m_rightLeader.set(ControlMode.MotionMagic, -arc_in_ticks);
 
-		double currentPos_L = m_leftLeader.getSelectedSensorPosition();
-		double currentPos_R = m_rightLeader.getSelectedSensorPosition();
+    int currentL = Math.abs(m_leftLeader.getSelectedSensorPosition());
+    int currentR = Math.abs(m_rightLeader.getSelectedSensorPosition());
+    int targetTicks = Math.abs(arc_in_ticks);
 
-		return Math.abs(currentPos_L - arc_in_ticks) < tolerance && (currentPos_R + arc_in_ticks) < tolerance;
+    return (targetTicks - currentL) < tolerance && (targetTicks - currentR) < tolerance;
   }
 
   public void motion_magic_start_config_turn(int degrees){
@@ -381,6 +391,7 @@ public class DriveTrain extends SubsystemBase {
     m_rightLeader.selectProfileSlot(DT_SLOT_TURN_MM, PID_PRIMARY);
   }
 
+  //shifting
   public void setLowGear(){
     m_gearbox.set(DoubleSolenoid.Value.kReverse);
   }
@@ -409,5 +420,16 @@ public class DriveTrain extends SubsystemBase {
   @SuppressWarnings("unused")
   private boolean isLowGear(){
     return (m_gearbox.get() == DoubleSolenoid.Value.kReverse);
+  }
+
+  public void disableMotorSafety(){
+    m_safety_drive.setSafetyEnabled(false);
+  }
+
+  public void enableMotorSafety(){
+    m_safety_drive.setSafetyEnabled(true);
+  }
+  public void feedWatchdog(){
+    m_safety_drive.feed();
   }
 }
