@@ -7,8 +7,9 @@
 
 package frc.robot.subsystems;
 
-import static frc.robot.Constants.*;
-import edu.wpi.first.wpilibj.DriverStation;
+import static frc.robot.Constants.COLOR_WHEEL_TALON;
+import static frc.robot.Constants.SPINNING_THREE_TIMES_SPEED;
+import static frc.robot.Constants.SPINNING_TO_A_COLOR;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
@@ -16,8 +17,8 @@ import com.revrobotics.ColorMatch;
 import com.revrobotics.ColorMatchResult;
 import com.revrobotics.ColorSensorV3;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.I2C;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -38,7 +39,7 @@ public class ColorWheel extends SubsystemBase {
    */
 
    private Boolean DoIHaveGameData = false;
-   private Boolean IsColor = false;
+   //private Boolean IsColor = false;
   private final I2C.Port i2cPort = I2C.Port.kOnboard;
   // changes the t2c port for the color sensor
 
@@ -115,25 +116,25 @@ public class ColorWheel extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    final Color detectedColor = m_colorSensor.getColor();
-    final ColorMatchResult match = m_colorMatcher.matchClosestColor(detectedColor);
-    String ColorString;
+    //final Color detectedColor = m_colorSensor.getColor();
+    //final ColorMatchResult match = m_colorMatcher.matchClosestColor(detectedColor);
+    // String ColorString;
 
-    if (match.color == kBlueTarget){
-      ColorString = "blue";
+    // if (match.color == kBlueTarget){
+    //   ColorString = "blue";
 
-    }else if (match.color == kGreenTarget){
-      ColorString = "green";
-    }else if (match.color == kRedTarget
-    ){
-      ColorString = "red";
+    // }else if (match.color == kGreenTarget){
+    //   ColorString = "green";
+    // }else if (match.color == kRedTarget
+    // ){
+    //   ColorString = "red";
 
-    }else if (match.color == kYellowTarget){
-      ColorString = "yellow";
+    // }else if (match.color == kYellowTarget){
+    //   ColorString = "yellow";
       
-    }else{
-      ColorString = "unknown";
-    }
+    // }else{
+    //   ColorString = "unknown";
+    // }
 
  
     if(this.DoIHaveGameData == true){

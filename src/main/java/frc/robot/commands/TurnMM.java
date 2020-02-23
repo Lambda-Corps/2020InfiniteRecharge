@@ -7,10 +7,6 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.DriveTrain;
 
@@ -19,9 +15,9 @@ public class TurnMM extends CommandBase {
   int m_arcLengthTicks;
   double m_arcLengthDegrees;
   int count_ok;
-  private double m_start_time;
+  //private double m_start_time;
   int STABLE_ITERATIONS_BEFORE_FINISHED = 5;
-  public final ShuffleboardTab turnMMTab;
+  //public final ShuffleboardTab turnMMTab;
   // private double m_turn_kP, m_kI, m_kD;
   // private NetworkTableEntry m_turnkPEntry, m_kIEntry, m_kDEntry, m_arclengthEntry, m_iterationEntry, m_drivedurationEntry, m_countokEntry, m_arclengthticksEntry;
   /**
@@ -30,7 +26,7 @@ public class TurnMM extends CommandBase {
   public TurnMM(DriveTrain driveTrain, double angle) {
     m_drivetrain = driveTrain;
     addRequirements(m_drivetrain);
-    turnMMTab = Shuffleboard.getTab("Turn MM Testing");
+    //turnMMTab = Shuffleboard.getTab("Turn MM Testing");
     // m_turnkPEntry = turnMMTab.add("kP_turn", 0 ).withPosition(1, 0).getEntry();
     // m_kIEntry = turnMMTab.add("kI", 0 ).withPosition(2, 0).getEntry();
     // m_kDEntry = turnMMTab.add("kD", 0 ).withPosition(3, 0).getEntry();
@@ -64,9 +60,6 @@ public class TurnMM extends CommandBase {
     // m_arcLengthDegrees = m_arclengthEntry.getDouble(0);
     m_arcLengthTicks = (int) (m_arcLengthDegrees * 139.416 * 0.2465); 
     // m_arclengthticksEntry.forceSetDouble(m_arcLengthTicks);
-    count_ok = 0;
-    m_drivetrain.reset_drivetrain_encoders();
-
     //m_kF = m_kFEntry.getDouble(0.17785118219749652294853963838665);
     // m_turn_kP = m_turnkPEntry.getDouble(0.0);
     // m_kI = m_kIEntry.getDouble(0.0);

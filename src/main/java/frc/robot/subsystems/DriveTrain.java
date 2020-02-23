@@ -7,9 +7,27 @@
 
 package frc.robot.subsystems;
 
-import static frc.robot.Constants.*;
-
-import java.util.Currency;
+import static frc.robot.Constants.CONTROLLER_DEADBAND_NEGATIVE;
+import static frc.robot.Constants.CONTROLLER_DEADBAND_POSOTIVE;
+import static frc.robot.Constants.DOWN_SHIFT_SPEED;
+import static frc.robot.Constants.DT_CONTINUOUS_CURRENT;
+import static frc.robot.Constants.DT_FORWARD_L_MODIFIER;
+import static frc.robot.Constants.DT_OPENLOOP_RAMP_RATE;
+import static frc.robot.Constants.DT_REVERSE_L_MODIFIER;
+import static frc.robot.Constants.DT_SLOT_DRIVE_MM;
+import static frc.robot.Constants.DT_SLOT_TURN_MM;
+import static frc.robot.Constants.GEARBOX_SOLENOID_A;
+import static frc.robot.Constants.GEARBOX_SOLENOID_B;
+import static frc.robot.Constants.LEFT_TALON_FOLLOWER;
+import static frc.robot.Constants.LEFT_TALON_LEADER;
+import static frc.robot.Constants.OPEN_LOOP_PEAK_OUTPUT_B;
+import static frc.robot.Constants.OPEN_LOOP_PEAK_OUTPUT_F;
+import static frc.robot.Constants.PID_PRIMARY;
+import static frc.robot.Constants.RIGHT_TALON_FOLLOWER;
+import static frc.robot.Constants.RIGHT_TALON_LEADER;
+import static frc.robot.Constants.UP_SHIFT_SPEED;
+import static frc.robot.Constants.kGains_DriveMM;
+import static frc.robot.Constants.kGains_TurnMM_big;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
@@ -286,6 +304,12 @@ public class DriveTrain extends SubsystemBase {
   //Motion Magic
   public void motion_magic_start_config_drive(boolean isForward){
     reset_drivetrain_encoders();
+
+    m_leftLeader.configMotionCruiseVelocity(2100, kTimeoutMs); 
+    m_leftLeader.configMotionAcceleration(500, kTimeoutMs); // cruise velocity / 2, so it will take 2 seconds
+		m_rightLeader.configMotionCruiseVelocity(2100, kTimeoutMs); 
+    m_rightLeader.configMotionAcceleration(500, kTimeoutMs); // cruise velocity / 2, so it will take 2 seconds
+    
     // Setup the Talon to use Drive MM slots
     m_leftLeader.selectProfileSlot(DT_SLOT_DRIVE_MM, PID_PRIMARY);
     m_rightLeader.selectProfileSlot(DT_SLOT_DRIVE_MM, PID_PRIMARY);
@@ -318,10 +342,10 @@ public class DriveTrain extends SubsystemBase {
   }
 
   public void motion_magic_end_config_turn(){
-    m_leftLeader.configMotionCruiseVelocity(3000, kTimeoutMs);
-    m_leftLeader.configMotionAcceleration(1500, kTimeoutMs);
-    m_rightLeader.configMotionCruiseVelocity(3000, kTimeoutMs);
-    m_rightLeader.configMotionAcceleration(1500, kTimeoutMs);
+    m_leftLeader.configMotionCruiseVelocity(2100, kTimeoutMs); 
+    m_leftLeader.configMotionAcceleration(500, kTimeoutMs); // cruise velocity / 2, so it will take 2 seconds
+		m_rightLeader.configMotionCruiseVelocity(2100, kTimeoutMs); 
+		m_rightLeader.configMotionAcceleration(500, kTimeoutMs); // cruise velocity / 2, so it will take 2 seconds
   }
   
   public int getLeftEncoderValue(){

@@ -6,13 +6,16 @@
 /*----------------------------------------------------------------------------*/
 
 package frc.robot;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
+import static frc.robot.Constants.DRIVER_REMOTE_PORT;
+
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 //import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 //import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.calibration.PIDTuningCommand;
@@ -21,24 +24,18 @@ import frc.robot.commands.ClimbAndLock;
 import frc.robot.commands.ClimberDown;
 import frc.robot.commands.ClimberUp;
 import frc.robot.commands.DefaultDriveTrainCommand;
-import frc.robot.commands.DriveMM;
 import frc.robot.commands.Drive_Backwards;
+import frc.robot.commands.EditTalonSpeeds;
 import frc.robot.commands.ExtendClimberSolenoid;
 import frc.robot.commands.RetractClimberSolenoid;
-import frc.robot.commands.Spin3Times;
-import frc.robot.commands.SpinToAColor;
 import frc.robot.commands.TurnMM;
+import frc.robot.commands.Autonomous.DriveOffLine;
 import frc.robot.commands.Autonomous.Pos1;
-import frc.robot.commands.Autonomous.*;
+import frc.robot.commands.Autonomous.Pos2_90;
+import frc.robot.commands.Autonomous.Pos3_45;
 import frc.robot.subsystems.Climber;
-import frc.robot.subsystems.ColorWheel;
-import frc.robot.commands.EditTalonSpeeds;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.Vision;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-
-import static frc.robot.Constants.*;
 /**
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
  * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
@@ -50,15 +47,17 @@ public class RobotContainer {
   private final DriveTrain m_drive_train = new DriveTrain();
   private final Vision m_vision = new Vision();
   private final Climber m_climber = new Climber();
+  //private final ColorWheel m_cColorWheel;
+
+  // Shuffleboard Info is the container for all the shuffleboard pieces we want to see
+  private ShuffleboardInfo m_sbi_instance;
   // The robot's operator interface functionality goes here
   private final XboxController m_driver_controller = new XboxController(DRIVER_REMOTE_PORT);
   public JoystickButton driver_RB;
   public JoystickButton driver_A;
   public JoystickButton driver_X;
 
-  private  ColorWheel m_cColorWheel;
-  private Spin3Times m_Spin3Times;
-  private SpinToAColor m_SpinToAColor;
+  
   //private DefaultIntakeCommand m_dDefaultIntakeCommand;
   //private Intake m_Intake;
 
@@ -73,17 +72,10 @@ public class RobotContainer {
     m_auto_chooser.addOption("Positon 2 Auto", new Pos2_90(m_drive_train));
     m_auto_chooser.addOption("Position 3 Auto", new Pos3_45(m_drive_train));
     m_auto_chooser.addOption("Drive Off of the Initiation Line", new DriveOffLine(m_drive_train));
+
     // Set the default commands for the subsystems
     m_drive_train.setDefaultCommand(new DefaultDriveTrainCommand(m_drive_train, m_driver_controller));
-
-    m_cColorWheel =new ColorWheel();
-    SmartDashboard.putData(new Spin3Times(m_cColorWheel));
-    SmartDashboard.putData(m_Spin3Times);
-
-    SmartDashboard.putData(new SpinToAColor(m_cColorWheel));
-    SmartDashboard.putData(m_SpinToAColor);
-
-    
+  
 
     // Configure the button bindings
     // NOTE -- This should not be called until all the subsystems have been instantiated and the 
@@ -104,8 +96,7 @@ public class RobotContainer {
     driver_RB.whenHeld(new Drive_Backwards(m_drive_train, m_driver_controller));
     driver_A = new JoystickButton(m_driver_controller, 1);
     driver_A.whenHeld(new AlignWithVision(m_drive_train, m_vision));
-    driver_X = new JoystickButton(m_driver_controller, 3);
-    driver_X.whenHeld(new EditTalonSpeeds(m_drive_train));
+
     }
 
 
@@ -122,35 +113,32 @@ public class RobotContainer {
 
   private void setupShuffleBoard(){
     // Setup methods for each subset of Shuffleboard needed setup
+    m_sbi_instance = ShuffleboardInfo.getInstance();
+    // Setup Autonomous
+    m_sbi_instance.addAutoChooser(m_auto_chooser);
+    
 
-    setupAutonomousShuffleboard();
-
-    setupPidTuningCommandShuffleboard();
-
-    setupClimberShuffleBoard();
-    setUpTalonSpeedCommand();
-    setupDriveMMShuffleboard();
-    setupTurnMMShuffleboard();
-    SmartDashboard.putData("75", new DriveMM(m_drive_train, 75));
-    SmartDashboard.putData("125", new DriveMM(m_drive_train, 125));
-    SmartDashboard.putData("200", new DriveMM(m_drive_train, 200));
   }
 
+  @SuppressWarnings("unused")
   private void setupAutonomousShuffleboard(){
     SmartDashboard.putData("Autonomous", new Pos1(m_drive_train));
-    Shuffleboard.getTab("Autonomous").add("Autonomous to Run", m_auto_chooser).withWidget(BuiltInWidgets.kComboBoxChooser);
+    
   }
 
+  @SuppressWarnings("unused")
   private void setupPidTuningCommandShuffleboard(){
     // First, assign a local variable the Tab that we are going to use
     // for pid tuning in Shuffleboard
     Shuffleboard.getTab("PID Tuning").add(new PIDTuningCommand());
   }
 
+  @SuppressWarnings("unused")
   private void setUpTalonSpeedCommand(){
     Shuffleboard.getTab("Talon Tuning").add(new EditTalonSpeeds(m_drive_train));
   }
 
+  @SuppressWarnings("unused")
   private void setupClimberShuffleBoard(){
     Shuffleboard.getTab("Climber").add("up",new ClimberUp(m_climber));
     Shuffleboard.getTab("Climber").add("down",new ClimberDown(m_climber));
@@ -158,15 +146,8 @@ public class RobotContainer {
     Shuffleboard.getTab("Climber").add("ExtendSolenoid",new ExtendClimberSolenoid(m_climber));
     Shuffleboard.getTab("Climber").add("RetractSolnoid",new RetractClimberSolenoid(m_climber));
   }
-
-  public void setLowGear(){
-    m_drive_train.setLowGear();
-  }
-
-  public void setHighGear(){
-    m_drive_train.setHighGear();
-  }
   
+  @SuppressWarnings("unused")
   private void setupDriveMMShuffleboard(){
     // First, assign a local variable the Tab that we are going to use
     // for pid tuning in Shuffleboard
@@ -174,8 +155,9 @@ public class RobotContainer {
     // Shuffleboard.getTab("Drive MM").add(new DriveMM(m_drive_train, -100)).withPosition(2, 0);
     //SmartDashboard.putData("Drive 100", new DriveMM(m_drive_train, 100));
     //SmartDashboard.putData("Drive -100", new DriveMM(m_drive_train, -100));
-
   }
+
+  @SuppressWarnings("unused")
   private void setupTurnMMShuffleboard(){
     Shuffleboard.getTab("Turn MM Testing").add(new TurnMM(m_drive_train, 0));
   }

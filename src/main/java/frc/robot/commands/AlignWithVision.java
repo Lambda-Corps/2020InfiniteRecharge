@@ -50,8 +50,8 @@ public class AlignWithVision extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    double right = m_vision.getTX()*m_steeringKP; // Right Y
-    double left  = (m_targetArea-m_vision.getTA())*m_driveKP; // Left X
+    double right = m_vision.getTX()*m_steeringKP; // Right X
+    double left  = (m_targetArea-m_vision.getTA())*m_driveKP; // Left Y
     SmartDashboard.putNumber("target area", m_vision.getTA());
 
     // m_DriveTrain.teleop_drive(left, right); // Drive until the target is at desired distance

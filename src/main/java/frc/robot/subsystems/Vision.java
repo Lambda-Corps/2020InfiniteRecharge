@@ -10,14 +10,17 @@ package frc.robot.subsystems;
 import java.util.ArrayList;
 
 import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.ShuffleboardInfo;
 
 public class Vision extends SubsystemBase {
   private final NetworkTable m_limelightTable;
   private double tv, tx, ta;
   private ArrayList<Double> m_targetList;
   private final int MAX_ENTRIES = 50;
+  private final NetworkTableEntry m_isTargetValid;
 
 
   /**
@@ -26,6 +29,7 @@ public class Vision extends SubsystemBase {
   public Vision() {
     m_limelightTable = NetworkTableInstance.getDefault().getTable("limelight");
     m_targetList = new ArrayList<Double>(MAX_ENTRIES);
+    m_isTargetValid = ShuffleboardInfo.getInstance().getTargetEntry();
   }
 
   @Override
@@ -35,10 +39,8 @@ public class Vision extends SubsystemBase {
     tx = m_limelightTable.getEntry("tx").getDouble(0);
     ta = m_limelightTable.getEntry("ta").getDouble(0);
 
-    // SmartDashboard.putNumber("tx", tx);
-    // SmartDashboard.putNumber("tv", tv);
-    // SmartDashboard.putNumber("ta", ta);
-    
+    m_isTargetValid.forceSetBoolean(isTargetValid());
+
     if (m_targetList.size() >= MAX_ENTRIES) {
       m_targetList.remove(0);
     }
