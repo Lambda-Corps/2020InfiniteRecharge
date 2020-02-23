@@ -23,15 +23,17 @@ public final class Constants {
     public static final int PARTNER_REMOTE_PORT  = 1;
     public static final double CONTROLLER_DEADBAND_POSOTIVE = 0.1;
     public static final double CONTROLLER_DEADBAND_NEGATIVE = -0.1;
-   //Climbing Subsytem
+
+   // DIO
     public static final int TOP_LIMIT_SWITCH     = 1;
     public static final int BOTTEM_LIMIT_SWITCH  = 0;
-    public static final int CLIMBER_CHANNEL_A    = 2;
-    public static final int CLIMBER_CHANNEL_B    = 3;
+    
     
     // Solenoids
     public static final int GEARBOX_SOLENOID_A = 0;
     public static final int GEARBOX_SOLENOID_B = 1;
+    public static final int CLIMBER_CHANNEL_A    = 2;
+    public static final int CLIMBER_CHANNEL_B    = 3;
 
     public static final int CLIMBER_MOTOR          = 1;
     public static final int LEFT_TALON_LEADER      = 3;
@@ -89,4 +91,10 @@ public final class Constants {
     public static final int SPINNING_THREE_TIMES_SPEED = 1;
     public static final int SPINNING_THREE_TIMES_COUNTER = 450;
     public static final double SPINNING_TO_A_COLOR = 0.5;
+
+    // Climber Constants
+    public static final double CLIMBER_UP_SPEED = 1.0;
+    public static final double CLIMBER_DOWN_SPEED = -1.0;
+    public static final double CLIMBER_RAMP_RATE = 1.5;
+    public static final int    CLIMBER_CURRENT_LIMIT = 25;
 }

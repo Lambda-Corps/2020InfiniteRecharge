@@ -7,11 +7,7 @@
 
 package frc.robot.subsystems;
 
-import static frc.robot.Constants.BOTTEM_LIMIT_SWITCH;
-import static frc.robot.Constants.CLIMBER_CHANNEL_A;
-import static frc.robot.Constants.CLIMBER_CHANNEL_B;
-import static frc.robot.Constants.CLIMBER_MOTOR;
-import static frc.robot.Constants.TOP_LIMIT_SWITCH;
+import static frc.robot.Constants.*;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
@@ -44,6 +40,9 @@ public class Climber extends SubsystemBase {
     this.m_toplimitswitch = new DigitalInput(TOP_LIMIT_SWITCH);
     this.m_bottomlimitswitch = new DigitalInput(BOTTEM_LIMIT_SWITCH);
     this.m_motor = new TalonSRX(CLIMBER_MOTOR);
+    m_motor.configFactoryDefault();
+    m_motor.configOpenloopRamp(CLIMBER_RAMP_RATE);
+    m_motor.configContinuousCurrentLimit(CLIMBER_CURRENT_LIMIT);
     this.m_solenoid = new DoubleSolenoid(CLIMBER_CHANNEL_A, CLIMBER_CHANNEL_B);
 
     this.m_motor.setInverted(false); // Positive Voltage = Climber Raise
