@@ -35,7 +35,7 @@ public class ShuffleboardInfo {
     private final NetworkTableEntry m_LowGearEntry, m_IntakeOn, m_Shooting, m_ClimberUp, m_isTargetValid, m_bottomBeam, m_2ndBeam, m_3rdBeam, m_topBeam;
 
     // Temporary Tuning values
-    private final NetworkTableEntry m_kpSteer;
+    private final NetworkTableEntry m_kpSteer, m_kpDrive;
     // private constructors is how you can create a singleton, then provide some 
     // sort of accessor method like getInstance(). Then the getinstance checks
     // whether or not we have an instantiated instance, and if not, then creates 
@@ -115,6 +115,7 @@ public class ShuffleboardInfo {
         
         // Setup the Vision
         m_kpSteer = Shuffleboard.getTab("VisionAlign").add("Steering KP", -0.055).getEntry();
+        m_kpDrive = Shuffleboard.getTab("VisionAlign").add("Drive KP", -0.055).getEntry();
         // Setup the LED tab information
 
 
@@ -167,6 +168,11 @@ public class ShuffleboardInfo {
     public NetworkTableEntry getKPsteerEntry() {
         return m_kpSteer;
     }
+
+    public NetworkTableEntry getKPDriveEntry(){
+        return m_kpDrive;
+    }
+    
 	public void addAutoChooser(SendableChooser<Command> m_auto_chooser) {
         m_driver_tab.add("Autonomous Chooser", m_auto_chooser)
             .withWidget(BuiltInWidgets.kComboBoxChooser)

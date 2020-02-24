@@ -8,9 +8,8 @@
 package frc.robot.commands;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.ShuffleboardInfo;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.Vision;
 
@@ -34,9 +33,9 @@ public class AlignWithVision extends CommandBase {
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(m_DriveTrain, m_vision);
 
-    m_kpSteer = Shuffleboard.getTab("VisionAlign").add("Steering KP", 0.055).getEntry();
-    m_minTA = Shuffleboard.getTab("VisionAlign").add("min TA", 2.1).getEntry();
-    m_drive_kp = Shuffleboard.getTab("VisionAlign").add("Driving KP", 0.8).getEntry();
+    m_kpSteer = ShuffleboardInfo.getInstance().getKPsteerEntry();
+    m_minTA = ShuffleboardInfo.getInstance().getTargetEntry();
+    m_drive_kp = ShuffleboardInfo.getInstance().getKPDriveEntry();
   }
 
   // Called when the command is initially scheduled.S
@@ -52,11 +51,6 @@ public class AlignWithVision extends CommandBase {
   public void execute() {
     double right = m_vision.getTX()*m_steeringKP; // Right X
     double left  = (m_targetArea-m_vision.getTA())*m_driveKP; // Left Y
-    SmartDashboard.putNumber("target area", m_vision.getTA());
-
-    // m_DriveTrain.teleop_drive(left, right); // Drive until the target is at desired distance
-    Shuffleboard.getTab("VisionAlign").add("left calc", left).getEntry().forceSetDouble(left);
-    Shuffleboard.getTab("VisionAlign").add("right calc", right).getEntry().forceSetDouble(right);
    
     if (m_vision.isTargetValid()) {
       if (m_vision.getTA() >= m_targetArea) {
