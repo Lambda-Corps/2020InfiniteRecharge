@@ -29,6 +29,7 @@ public class ShuffleboardInfo {
 
     // Driver Tab Entries
     private final NetworkTableEntry m_LowGearEntry;
+    private final NetworkTableEntry m_IsDownEntry;
     // private constructors is how you can create a singleton, then provide some 
     // sort of accessor method like getInstance(). Then the getinstance checks
     // whether or not we have an instantiated instance, and if not, then creates 
@@ -47,7 +48,9 @@ public class ShuffleboardInfo {
 
         // Setup the Driver tab
         m_LowGearEntry = m_driver_tab.add("Low Gear", false).getEntry();
-
+        m_IsDownEntry = m_led_tab.add("Climber Down?", false).getEntry();
+        //Set up Shooter
+        
         // Setup the Vision
     
 
@@ -67,4 +70,8 @@ public class ShuffleboardInfo {
     public NetworkTableEntry getDriverLowGearEntry(){
         return m_LowGearEntry;
     }
+
+	public NetworkTableEntry getDownEntry() {
+		return m_IsDownEntry;
+	}
 }

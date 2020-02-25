@@ -10,7 +10,7 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-
+import frc.robot.Constants;
 //import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -19,15 +19,18 @@ public class Shooter extends SubsystemBase {
    * Creates a new Shooter.
    */
    private final TalonSRX Shooter;
+   
   // private final Encoder ShooterEncoder;
   public Shooter() {
     Shooter = new TalonSRX(2);
     Shooter.setSensorPhase(false);
     Shooter.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 0);
+    
   }
 
   @Override
   public void periodic() {
+    
     // This method will be called once per scheduler run
   }
 

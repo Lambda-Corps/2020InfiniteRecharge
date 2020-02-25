@@ -12,14 +12,18 @@ import static frc.robot.Constants.CLIMBER_CHANNEL_A;
 import static frc.robot.Constants.CLIMBER_CHANNEL_B;
 import static frc.robot.Constants.CLIMBER_MOTOR;
 import static frc.robot.Constants.TOP_LIMIT_SWITCH;
+import frc.robot.subsystems.LEDLights;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.ShuffleboardInfo;
 
 public class Climber extends SubsystemBase {
   // Settings
@@ -27,11 +31,11 @@ public class Climber extends SubsystemBase {
   private final double LOWER_SPEED = -1.0;
 
   // Components of the climber.
-  private final DoubleSolenoid m_solenoid;
+  final DoubleSolenoid m_solenoid;
   private final DigitalInput m_toplimitswitch;
   private final DigitalInput m_bottomlimitswitch;
   private final TalonSRX m_motor;
-
+  private final NetworkTableEntry m_Is_upEntry;
   // Working variables.
   //private boolean emergencyOff = false;
 
@@ -45,7 +49,7 @@ public class Climber extends SubsystemBase {
     this.m_bottomlimitswitch = new DigitalInput(BOTTEM_LIMIT_SWITCH);
     this.m_motor = new TalonSRX(CLIMBER_MOTOR);
     this.m_solenoid = new DoubleSolenoid(CLIMBER_CHANNEL_A, CLIMBER_CHANNEL_B);
-
+    m_Is_upEntry = ShuffleboardInfo.getInstance().getDriverLowGearEntry();
     this.m_motor.setInverted(false); // Positive Voltage = Climber Raise
 
     Shuffleboard.getTab("Climber").add("top switch", m_toplimitswitch);
@@ -134,5 +138,6 @@ public class Climber extends SubsystemBase {
 
   @Override
   public void periodic() {
+    m_Is_upEntry.forceSetBoolean(m_bottomlimitswitch.get() == false);
   }
 }

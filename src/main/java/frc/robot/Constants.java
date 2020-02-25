@@ -1,3 +1,4 @@
+
 /*----------------------------------------------------------------------------*/
 /* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
@@ -6,6 +7,9 @@
 /*----------------------------------------------------------------------------*/
 
 package frc.robot;
+
+import edu.wpi.first.wpilibj.AddressableLED;
+import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -40,8 +44,11 @@ public final class Constants {
     public static final int RIGHT_TALON_FOLLOWER   = 6;
     public static final int COLOR_WHEEL_TALON      = 7; // this is spinning the Motor
     public static final int INSIDE_INTAKE          = 10;   //This Talon controls the motor 
-    public static final int OUTSIDE_INTAKE         = 11;       // This Motor 
+    public static final int OUTSIDE_INTAKE          = 11;       // This Motor 
     public static final int OUTSIDE_INTAKE_INDEXER = 12; //INTAKE THAT TAKES THE POWER CELLS UP TO THE SHOOTER
+    //LED
+    // public static final AddressableLED LED_DRIVER_LOW_GEAR    = 7;
+    // public static final AddressableLEDBuffer LED_BUFFER       = 60;    //might keep   
 
     // DriveTrain Configuration Constants
     public static final double  DT_OPENLOOP_RAMP_RATE  = .3;
