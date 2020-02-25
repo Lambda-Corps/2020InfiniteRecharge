@@ -7,27 +7,7 @@
 
 package frc.robot.subsystems;
 
-import static frc.robot.Constants.CONTROLLER_DEADBAND_NEGATIVE;
-import static frc.robot.Constants.CONTROLLER_DEADBAND_POSOTIVE;
-import static frc.robot.Constants.DOWN_SHIFT_SPEED;
-import static frc.robot.Constants.DT_CONTINUOUS_CURRENT;
-import static frc.robot.Constants.DT_FORWARD_L_MODIFIER;
-import static frc.robot.Constants.DT_OPENLOOP_RAMP_RATE;
-import static frc.robot.Constants.DT_REVERSE_L_MODIFIER;
-import static frc.robot.Constants.DT_SLOT_DRIVE_MM;
-import static frc.robot.Constants.DT_SLOT_TURN_MM;
-import static frc.robot.Constants.GEARBOX_SOLENOID_A;
-import static frc.robot.Constants.GEARBOX_SOLENOID_B;
-import static frc.robot.Constants.LEFT_TALON_FOLLOWER;
-import static frc.robot.Constants.LEFT_TALON_LEADER;
-import static frc.robot.Constants.OPEN_LOOP_PEAK_OUTPUT_B;
-import static frc.robot.Constants.OPEN_LOOP_PEAK_OUTPUT_F;
-import static frc.robot.Constants.PID_PRIMARY;
-import static frc.robot.Constants.RIGHT_TALON_FOLLOWER;
-import static frc.robot.Constants.RIGHT_TALON_LEADER;
-import static frc.robot.Constants.UP_SHIFT_SPEED;
-import static frc.robot.Constants.kGains_DriveMM;
-import static frc.robot.Constants.kGains_TurnMM_big;
+import static frc.robot.Constants.*;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
@@ -415,36 +395,38 @@ public class DriveTrain extends SubsystemBase {
     m_rightLeader.selectProfileSlot(DT_SLOT_TURN_MM, PID_PRIMARY);
   }
 
-  //shifting
-  public void setLowGear(){
-    m_gearbox.set(DoubleSolenoid.Value.kReverse);
+ //shifting
+ public void setLowGear(){
+  m_gearbox.set(DT_LOW_GEAR);
+}
+
+public void setHighGear(){
+  m_gearbox.set(DT_HIGH_GEAR);
+}
+
+public void autoShiftGears(){
+
+  int leftSpeed = m_leftLeader.getSelectedSensorVelocity();
+  int rightSpeed = m_rightLeader.getSelectedSensorVelocity();
+  DoubleSolenoid.Value solenoidPosition = m_gearbox.get();
+  double currentSpeed = Math.max(Math.abs(leftSpeed), Math.abs(rightSpeed));
+
+  if((currentSpeed > UP_SHIFT_SPEED) && 
+    (solenoidPosition == DT_LOW_GEAR) || solenoidPosition == Value.kOff){
+    //Low to High
+    setHighGear();
   }
-
-  public void setHighGear(){
-    m_gearbox.set(DoubleSolenoid.Value.kForward);
+  else if((currentSpeed < DOWN_SHIFT_SPEED) && 
+    (solenoidPosition == DT_HIGH_GEAR) || (solenoidPosition == Value.kOff)){
+    //High to Low
+    setLowGear();
   }
+}
 
-  public void autoShiftGears(){
-
-    int leftSpeed = m_leftLeader.getSelectedSensorVelocity();
-    int rightSpeed = m_rightLeader.getSelectedSensorVelocity();
-    DoubleSolenoid.Value solenoidPosition = m_gearbox.get();
-    double currentSpeed = Math.max(Math.abs(leftSpeed), Math.abs(rightSpeed));
-
-    if((currentSpeed > UP_SHIFT_SPEED) && (solenoidPosition == Value.kForward)){
-      //Low to High
-      setLowGear();
-    }
-    else if((currentSpeed < DOWN_SHIFT_SPEED) && (solenoidPosition == Value.kReverse)){
-      //High to Low
-      setHighGear();
-    }
-  }
-
-  @SuppressWarnings("unused")
-  private boolean isLowGear(){
-    return (m_gearbox.get() == DoubleSolenoid.Value.kReverse);
-  }
+@SuppressWarnings("unused")
+private boolean isLowGear(){
+  return (m_gearbox.get() == DT_LOW_GEAR);
+}
 
   public void disableMotorSafety(){
     m_safety_drive.setSafetyEnabled(false);

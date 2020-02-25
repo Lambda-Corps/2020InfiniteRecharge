@@ -117,7 +117,7 @@ public class RobotContainer {
     // Setup Autonomous
     m_sbi_instance.addAutoChooser(m_auto_chooser);
     
-
+    setupClimberShuffleBoard();
   }
 
   @SuppressWarnings("unused")
@@ -162,5 +162,7 @@ public class RobotContainer {
     Shuffleboard.getTab("Turn MM Testing").add(new TurnMM(m_drive_train, 0));
   }
 
-
+  public void setDriveTrainToLowGear(){
+    m_drive_train.setLowGear();
+  }
 }
