@@ -10,6 +10,7 @@ package frc.robot.subsystems;
 import static frc.robot.Constants.*;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -19,8 +20,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Climber extends SubsystemBase {
   // Settings
-  private final double RAISE_SPEED = 1.0;
-  private final double LOWER_SPEED = -1.0;
+  private final double RAISE_SPEED = 1;
+  private final double LOWER_SPEED = -1;
 
   // Components of the climber.
   private final DoubleSolenoid m_solenoid;
@@ -41,7 +42,8 @@ public class Climber extends SubsystemBase {
     this.m_bottomlimitswitch = new DigitalInput(BOTTEM_LIMIT_SWITCH);
     this.m_motor = new TalonSRX(CLIMBER_MOTOR);
     m_motor.configFactoryDefault();
-    m_motor.configOpenloopRamp(CLIMBER_RAMP_RATE);
+    m_motor.configOpenloopRamp(.25);
+    m_motor.setNeutralMode(NeutralMode.Brake);
     m_motor.configContinuousCurrentLimit(CLIMBER_CURRENT_LIMIT);
     this.m_solenoid = new DoubleSolenoid(CLIMBER_CHANNEL_A, CLIMBER_CHANNEL_B);
 
@@ -129,6 +131,14 @@ public class Climber extends SubsystemBase {
    */
   public void retractLockingPistons() {
     this.m_solenoid.set(DoubleSolenoid.Value.kForward);
+  }
+
+  public void setNeutralModeCoast(){
+    m_motor.setNeutralMode(NeutralMode.Coast);
+  }
+
+  public void setNeutralModeBrake(){
+    m_motor.setNeutralMode(NeutralMode.Brake);
   }
 
   @Override
