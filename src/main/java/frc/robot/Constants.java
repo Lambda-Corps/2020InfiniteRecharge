@@ -123,7 +123,7 @@ public final class Constants {
     public static final int SHOOTER_SETPOINT_WALL = 9000;
     public static final int SHOOTER_SETPOINT_LINE = 9000;
     public static final int SHOOTER_SETPOINT_TRENCH = 9000;
-    public static final double SHOOTER_RAMP_TIME = 2.0;
+    public static final double SHOOTER_RAMP_TIME = 1.0;
     public static final int RUNTIME = 5;
     // Each shooting distance may have different gains to make it work
     public static final int SHOOTER_SLOT_INITIATION_LINE = 0;
@@ -139,6 +139,6 @@ public final class Constants {
    public static int CONVEYOR_SPEED = 1;
    public static double INTAKE_SPEED = -.7;
    public static double INDEXER_SPEED = .7;  
-   public static final Value INTAKE_UP_POSITION = Value.kForward;
-   public static final Value INTAKE_DOWN_POSITION = Value.kReverse;
+   public static final Value INTAKE_UP_POSITION = Value.kReverse;
+   public static final Value INTAKE_DOWN_POSITION = Value.kForward;
 }

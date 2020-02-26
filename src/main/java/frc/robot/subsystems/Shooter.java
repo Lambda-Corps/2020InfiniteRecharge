@@ -97,7 +97,7 @@ public class Shooter extends SubsystemBase {
   }
 
   public void shootFromDistance(ShotDistance distance){
-    setShotDistance(distance);
+    //setShotDistance(distance);
     this.m_topShooter.set(ControlMode.Velocity, m_shooter_set_point);
   }
 
