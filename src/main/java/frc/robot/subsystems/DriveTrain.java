@@ -34,7 +34,7 @@ public class DriveTrain extends SubsystemBase {
   private final DifferentialDrive m_safety_drive;
 
   private static final int kPIDLoopIdx = 0;
-  private static final int kTimeoutMs = 5;
+
 
   private final NetworkTableEntry m_low_gear_entry;
   //private final AHRS navx;

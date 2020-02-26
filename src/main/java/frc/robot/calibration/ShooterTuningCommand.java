@@ -12,6 +12,7 @@ package frc.robot.calibration;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+
 //import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 //import frc.robot.subsystems.DriveTrain;
@@ -64,7 +65,7 @@ public class ShooterTuningCommand extends CommandBase {
     m_setpoint = m_spEntry.getDouble(0);
     m_tolerance = m_tolEntry.getDouble(0);
 
-    m_shooter.configureVelocityPID(kp, ki, kd, kf);
+    // m_shooter.configureVelocityPID(kp, ki, kd, kf);
 
   }
 
