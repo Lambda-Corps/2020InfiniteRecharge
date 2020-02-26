@@ -53,9 +53,7 @@ public class RobotContainer {
   private ShuffleboardInfo m_sbi_instance;
   // The robot's operator interface functionality goes here
   private final XboxController m_driver_controller = new XboxController(DRIVER_REMOTE_PORT);
-  public JoystickButton driver_RB;
-  public JoystickButton driver_A;
-  public JoystickButton driver_X;
+  private JoystickButton driver_RB, driver_A, driver_X, driver_lb,Driver_start,Driver_back,; 
 
   
   //private DefaultIntakeCommand m_dDefaultIntakeCommand;
@@ -92,10 +90,18 @@ public class RobotContainer {
    * {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    driver_RB = new JoystickButton(m_driver_controller, 6);
+    driver_RB = new JoystickButton(m_driver_controller, XboxController.Button.kBumperRight.value);
     driver_RB.whenHeld(new Drive_Backwards(m_drive_train, m_driver_controller));
     driver_A = new JoystickButton(m_driver_controller, 1);
     driver_A.whenHeld(new AlignWithVision(m_drive_train, m_vision));
+    driver_lb = new JoystickButton(m_driver_controller, XboxController.Button.kBumperLeft.value);
+    //driver_lb.whenPressed(new ToggleIntake());
+    Driver_start = new JoystickButton(m_driver_controller,XboxController.Button.kStart.value);
+    Driver_start.whenPressed(new ClimberUp(m_climber));
+    Driver_back = new JoystickButton(m_driver_controller,XboxController.Button.kBack.value);
+    Driver_back.whenPressed(new ClimbAndLock(m_climber));
+    
+
 
     }
 
