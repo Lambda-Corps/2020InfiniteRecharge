@@ -322,10 +322,10 @@ public class DriveTrain extends SubsystemBase {
   }
 
   public void motion_magic_end_config_turn(){
-    m_leftLeader.configMotionCruiseVelocity(2100, kTimeoutMs); 
-    m_leftLeader.configMotionAcceleration(500, kTimeoutMs); // cruise velocity / 2, so it will take 2 seconds
-		m_rightLeader.configMotionCruiseVelocity(2100, kTimeoutMs); 
-		m_rightLeader.configMotionAcceleration(500, kTimeoutMs); // cruise velocity / 2, so it will take 2 seconds
+    m_leftLeader.configMotionCruiseVelocity(2100, kTimeoutMs);
+    m_leftLeader.configMotionAcceleration(500, kTimeoutMs);
+    m_rightLeader.configMotionCruiseVelocity(2100, kTimeoutMs);
+    m_rightLeader.configMotionAcceleration(500, kTimeoutMs);
   }
   
   public int getLeftEncoderValue(){

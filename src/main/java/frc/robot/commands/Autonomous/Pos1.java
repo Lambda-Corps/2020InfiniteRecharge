@@ -10,9 +10,12 @@ package frc.robot.commands.Autonomous;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import frc.robot.commands.AlignWithVision;
 import frc.robot.commands.DriveMM;
 import frc.robot.commands.TurnMM;
 import frc.robot.subsystems.DriveTrain;
+import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.Vision;
 
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
@@ -21,7 +24,7 @@ public class Pos1 extends SequentialCommandGroup {
   /**
    * Creates a new Auto1.
    */
-  public Pos1(DriveTrain driveTrain) {
+  public Pos1(DriveTrain driveTrain, Vision vision, Shooter shooter, Intake intake) {
     // Add your commands in the super() call, e.g.
     // super(new FooCommand(), new BarCommand());
     super();
@@ -35,9 +38,10 @@ public class Pos1 extends SequentialCommandGroup {
         new PrintCommand("raise intake")
       ),
       new TurnMM(driveTrain, 90),
-      new WaitCommand((1)),
+      new WaitCommand(1),
       new DriveMM(driveTrain, 200), 
       new TurnMM(driveTrain, -90),
+      //new AlignWithVision(driveTrain, vision),
       new PrintCommand("shoot 5 balls")
     );
       

@@ -53,7 +53,7 @@ public class RobotContainer {
   private ShuffleboardInfo m_sbi_instance;
   // The robot's operator interface functionality goes here
   private final XboxController m_driver_controller = new XboxController(DRIVER_REMOTE_PORT);
-  private JoystickButton driver_RB, driver_A, driver_X, driver_lb,Driver_start,Driver_back,; 
+  private JoystickButton driver_RB, driver_A, driver_X, driver_lb, Driver_start, Driver_back; 
 
   
   //private DefaultIntakeCommand m_dDefaultIntakeCommand;
