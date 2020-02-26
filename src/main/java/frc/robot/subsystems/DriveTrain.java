@@ -13,11 +13,11 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.InvertType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.can.TalonSRXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
-import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpiutil.math.MathUtil;
@@ -30,6 +30,7 @@ public class DriveTrain extends SubsystemBase {
 
   private final WPI_TalonSRX m_rightLeader, m_rightFollower;
   private final WPI_TalonSRX m_leftLeader, m_leftFollower;
+  private final TalonSRXConfiguration m_rightConfig, m_leftConfig;
   private final DoubleSolenoid m_gearbox;
   private final DifferentialDrive m_safety_drive;
 
@@ -44,106 +45,88 @@ public class DriveTrain extends SubsystemBase {
   public DriveTrain() {
     // Get shuffleboard components
     m_low_gear_entry = ShuffleboardInfo.getInstance().getDriverLowGearEntry();
-
-    //navx = new AHRS();
-    // Finish with phoenix tuner to determine inversion, sensor phase
-    // and all the rest of the Bring-Up steps for the Talon
     m_rightLeader = new WPI_TalonSRX(RIGHT_TALON_LEADER);
-    m_rightLeader.configFactoryDefault();
+    m_rightFollower = new WPI_TalonSRX(RIGHT_TALON_FOLLOWER);
+    m_rightConfig = new TalonSRXConfiguration();
+    m_rightLeader.configAllSettings(m_rightConfig);
+    m_rightFollower.configAllSettings(m_rightConfig);
+
+    m_rightConfig.openloopRamp = DT_OPENLOOP_RAMP_RATE;
+    m_rightConfig.continuousCurrentLimit = DT_CONTINUOUS_CURRENT;
+    m_rightConfig.nominalOutputForward = 0;
+    m_rightConfig.nominalOutputReverse = 0;
+    m_rightConfig.peakOutputForward = 1;
+    m_rightConfig.peakOutputReverse = -1;
+    m_rightConfig.slot0.kF = kGains_DriveMM.kF;
+    m_rightConfig.slot0.kP = kGains_DriveMM.kP;
+    m_rightConfig.slot0.kI = kGains_DriveMM.kI;
+    m_rightConfig.slot0.kD = kGains_DriveMM.kD;
+    m_rightConfig.slot0.allowableClosedloopError = 10;
+    m_rightConfig.slot1.kF = kGains_TurnMM_big.kF;
+    m_rightConfig.slot1.kP = kGains_TurnMM_big.kP;
+    m_rightConfig.slot1.kI = kGains_TurnMM_big.kI;
+    m_rightConfig.slot1.kD = kGains_TurnMM_big.kD;
+    m_rightConfig.slot1.allowableClosedloopError = 10;
+    m_rightConfig.motionCruiseVelocity = DT_MOTION_CRUISE_VEL;
+    m_rightConfig.motionAcceleration = DT_MOTION_ACCELERATION;
+    m_rightLeader.configAllSettings(m_rightConfig);
+    
     m_rightLeader.setNeutralMode(NeutralMode.Brake);
     m_rightLeader.setSensorPhase(true);
-    m_rightFollower = new WPI_TalonSRX(RIGHT_TALON_FOLLOWER);
-    m_rightFollower.configFactoryDefault();
+    m_rightLeader.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 0);
+    m_rightLeader.setSelectedSensorPosition(0, kPIDLoopIdx, kTimeoutMs);
     m_rightFollower.setNeutralMode(NeutralMode.Brake);
     m_rightFollower.follow(m_rightLeader);
 
     // Phoenix Tuner showed left side needs to be inverted
     m_leftLeader  = new WPI_TalonSRX(LEFT_TALON_LEADER);
-    m_leftLeader.configFactoryDefault();
+    m_leftFollower = new WPI_TalonSRX(LEFT_TALON_FOLLOWER);
+    m_leftConfig = new TalonSRXConfiguration();
+    m_leftLeader.configAllSettings(m_leftConfig);
+    m_leftFollower.configAllSettings(m_leftConfig);
+
+    m_leftConfig.openloopRamp = DT_OPENLOOP_RAMP_RATE;
+    m_leftConfig.continuousCurrentLimit = DT_CONTINUOUS_CURRENT;
+    m_leftConfig.nominalOutputForward = 0;
+    m_leftConfig.nominalOutputReverse = 0;
+    m_leftConfig.peakOutputForward = 1;
+    m_leftConfig.peakOutputReverse = -1;
+    m_leftConfig.slot0.kF = kGains_DriveMM.kF;
+    m_leftConfig.slot0.kP = kGains_DriveMM.kP;
+    m_leftConfig.slot0.kI = kGains_DriveMM.kI;
+    m_leftConfig.slot0.kD = kGains_DriveMM.kD;
+    m_leftConfig.slot0.allowableClosedloopError = 10;
+    m_leftConfig.slot1.kF = kGains_TurnMM_big.kF;
+    m_leftConfig.slot1.kP = kGains_TurnMM_big.kP;
+    m_leftConfig.slot1.kI = kGains_TurnMM_big.kI;
+    m_leftConfig.slot1.kD = kGains_TurnMM_big.kD;
+    m_leftConfig.slot1.allowableClosedloopError = 10;
+    m_leftConfig.motionCruiseVelocity = DT_MOTION_CRUISE_VEL;
+    m_leftConfig.motionAcceleration = DT_MOTION_ACCELERATION;
+    m_leftLeader.configAllSettings(m_leftConfig);
+
     m_leftLeader.setNeutralMode(NeutralMode.Brake);
     m_leftLeader.setSensorPhase(true);
     m_leftLeader.setInverted(true);
-    m_leftFollower = new WPI_TalonSRX(LEFT_TALON_FOLLOWER);
-    m_leftFollower.configFactoryDefault();
+    m_leftLeader.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 0);
+    m_leftLeader.setSelectedSensorPosition(0, kPIDLoopIdx, kTimeoutMs);
     m_leftFollower.setNeutralMode(NeutralMode.Brake);
     m_leftFollower.setInverted(InvertType.FollowMaster);
     m_leftFollower.follow(m_leftLeader);
 
-    // Setup the power metering for the robot
-    m_leftLeader.configOpenloopRamp(DT_OPENLOOP_RAMP_RATE);
-    m_leftFollower.configOpenloopRamp(DT_OPENLOOP_RAMP_RATE);
-    m_rightLeader.configOpenloopRamp(DT_OPENLOOP_RAMP_RATE);
-    m_rightFollower.configOpenloopRamp(DT_OPENLOOP_RAMP_RATE);
-    
-    m_leftLeader.configContinuousCurrentLimit(DT_CONTINUOUS_CURRENT);
-    m_rightLeader.configContinuousCurrentLimit(DT_CONTINUOUS_CURRENT);
-    m_leftFollower.configContinuousCurrentLimit(DT_CONTINUOUS_CURRENT);
-    m_rightFollower.configContinuousCurrentLimit(DT_CONTINUOUS_CURRENT);
-
-    m_gearbox = new DoubleSolenoid(GEARBOX_SOLENOID_A, GEARBOX_SOLENOID_B);
-    setLowGear();
-
-    // Talon Speed Modifiers
-
-    		// Set up Motion Magic
-		// nominal output forward (0)
-		m_leftLeader.configNominalOutputForward(0, kTimeoutMs);
-		m_rightLeader.configNominalOutputForward(0, kTimeoutMs);
-		// nominal output reverse (0)
-		m_leftLeader.configNominalOutputReverse(0, kTimeoutMs);
-		m_rightLeader.configNominalOutputReverse(0, kTimeoutMs);
-		// peak output forward (1)
-		m_leftLeader.configPeakOutputForward(OPEN_LOOP_PEAK_OUTPUT_F, kTimeoutMs);
-		m_rightLeader.configPeakOutputForward(OPEN_LOOP_PEAK_OUTPUT_F, kTimeoutMs);
-		// peak output reverse (-1)
-		m_leftLeader.configPeakOutputReverse(OPEN_LOOP_PEAK_OUTPUT_B, kTimeoutMs);
-		m_rightLeader.configPeakOutputReverse(OPEN_LOOP_PEAK_OUTPUT_B, kTimeoutMs);
 		// select profile slot
 		m_leftLeader.selectProfileSlot(DT_SLOT_DRIVE_MM, kPIDLoopIdx);
     m_rightLeader.selectProfileSlot(DT_SLOT_DRIVE_MM, kPIDLoopIdx);
     
-    // Setup MotionMagic pid values for Drive and then Turn
-		// config DriveMM pidf values
-		m_leftLeader.config_kF(DT_SLOT_DRIVE_MM, 0.1778511821974965229, kTimeoutMs);
-		m_leftLeader.config_kP(DT_SLOT_DRIVE_MM, kGains_DriveMM.kP, kTimeoutMs);
-		m_leftLeader.config_kI(DT_SLOT_DRIVE_MM, kGains_DriveMM.kI, kTimeoutMs);
-		m_leftLeader.config_kD(DT_SLOT_DRIVE_MM, kGains_DriveMM.kD, kTimeoutMs);
-		m_rightLeader.config_kF(DT_SLOT_DRIVE_MM, 0.18686069167072576716999, kTimeoutMs);
-		m_rightLeader.config_kP(DT_SLOT_DRIVE_MM, kGains_DriveMM.kP, kTimeoutMs);
-		m_rightLeader.config_kI(DT_SLOT_DRIVE_MM, kGains_DriveMM.kI, kTimeoutMs);
-    m_rightLeader.config_kD(DT_SLOT_DRIVE_MM, kGains_DriveMM.kD, kTimeoutMs);
-    
-    // config TurnMM pidf values, default to turns > 45 degrees
-		m_leftLeader.config_kF(DT_SLOT_TURN_MM, kGains_TurnMM_big.kF, kTimeoutMs);
-		m_leftLeader.config_kP(DT_SLOT_TURN_MM, kGains_TurnMM_big.kP, kTimeoutMs);
-		m_leftLeader.config_kI(DT_SLOT_TURN_MM, kGains_TurnMM_big.kI, kTimeoutMs);
-		m_leftLeader.config_kD(DT_SLOT_TURN_MM, kGains_TurnMM_big.kD, kTimeoutMs);
-		m_rightLeader.config_kF(DT_SLOT_TURN_MM, kGains_TurnMM_big.kF, kTimeoutMs);
-		m_rightLeader.config_kP(DT_SLOT_TURN_MM, kGains_TurnMM_big.kP, kTimeoutMs);
-		m_rightLeader.config_kI(DT_SLOT_TURN_MM, kGains_TurnMM_big.kI, kTimeoutMs);
-    m_rightLeader.config_kD(DT_SLOT_TURN_MM, kGains_TurnMM_big.kD, kTimeoutMs);
-    
-		// config cruise velocity, acceleration
-    m_leftLeader.configMotionCruiseVelocity(2100, kTimeoutMs); 
-    m_leftLeader.configMotionAcceleration(500, kTimeoutMs); // cruise velocity / 2, so it will take 2 seconds
-		m_rightLeader.configMotionCruiseVelocity(2100, kTimeoutMs); 
-		m_rightLeader.configMotionAcceleration(500, kTimeoutMs); // cruise velocity / 2, so it will take 2 seconds
-		
-
-		m_leftLeader.configAllowableClosedloopError(0, 10, 3);
-		m_rightLeader.configAllowableClosedloopError(0, 10, 3);
-
-		// Set the quadrature encoders to be the source feedback device for the talons
-		m_leftLeader.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 0);
-		m_rightLeader.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 0);
-		// reset sensors
-		m_leftLeader.setSelectedSensorPosition(0, kPIDLoopIdx, kTimeoutMs);
-    m_rightLeader.setSelectedSensorPosition(0, kPIDLoopIdx, kTimeoutMs);
+	  //m_leftLeader.config_kF(DT_SLOT_DRIVE_MM, 0.1778511821974965229, kTimeoutMs);
+		//m_rightLeader.config_kF(DT_SLOT_DRIVE_MM, 0.18686069167072576716999, kTimeoutMs);
 
     // We have observed a couple times where the robot loses control and continues without operator
     // input, changed the TalonSRX objects to be WPI_Talons so we can use the differential drive.
     // We aren't going to actually drive with it.  We are just going to use it for the Watchdog timer.
     m_safety_drive = new DifferentialDrive(m_leftLeader, m_rightLeader);
+
+    m_gearbox = new DoubleSolenoid(GEARBOX_SOLENOID_A, GEARBOX_SOLENOID_B);
   }
 
   private double normalize(double speed) {
@@ -395,38 +378,38 @@ public class DriveTrain extends SubsystemBase {
     m_rightLeader.selectProfileSlot(DT_SLOT_TURN_MM, PID_PRIMARY);
   }
 
- //shifting
- public void setLowGear(){
-  m_gearbox.set(DT_LOW_GEAR);
-}
-
-public void setHighGear(){
-  m_gearbox.set(DT_HIGH_GEAR);
-}
-
-public void autoShiftGears(){
-
-  int leftSpeed = m_leftLeader.getSelectedSensorVelocity();
-  int rightSpeed = m_rightLeader.getSelectedSensorVelocity();
-  DoubleSolenoid.Value solenoidPosition = m_gearbox.get();
-  double currentSpeed = Math.max(Math.abs(leftSpeed), Math.abs(rightSpeed));
-
-  if((currentSpeed > UP_SHIFT_SPEED) && 
-    (solenoidPosition == DT_LOW_GEAR) || solenoidPosition == Value.kOff){
-    //Low to High
-    setHighGear();
+   //shifting
+   public void setLowGear(){
+    m_gearbox.set(DT_LOW_GEAR);
   }
-  else if((currentSpeed < DOWN_SHIFT_SPEED) && 
-    (solenoidPosition == DT_HIGH_GEAR) || (solenoidPosition == Value.kOff)){
-    //High to Low
-    setLowGear();
-  }
-}
 
-@SuppressWarnings("unused")
-private boolean isLowGear(){
-  return (m_gearbox.get() == DT_LOW_GEAR);
-}
+  public void setHighGear(){
+    m_gearbox.set(DT_HIGH_GEAR);
+  }
+
+  public void autoShiftGears(){
+
+    int leftSpeed = m_leftLeader.getSelectedSensorVelocity();
+    int rightSpeed = m_rightLeader.getSelectedSensorVelocity();
+
+    leftSpeed = Math.abs(leftSpeed);
+    rightSpeed = Math.abs(rightSpeed);
+
+    if( leftSpeed > UP_SHIFT_SPEED && rightSpeed > UP_SHIFT_SPEED ){
+      // Should be in High Gear 
+      setHighGear();
+    }
+    else if ( leftSpeed < DOWN_SHIFT_SPEED || rightSpeed < DOWN_SHIFT_SPEED ){
+      // Any other condition we should probably be in low gear, this includes when
+      // one side is turning faster than the other.
+      setLowGear();
+    }
+  }
+
+  @SuppressWarnings("unused")
+  private boolean isLowGear(){
+    return (m_gearbox.get() == DT_LOW_GEAR);
+  }
 
   public void disableMotorSafety(){
     m_safety_drive.setSafetyEnabled(false);

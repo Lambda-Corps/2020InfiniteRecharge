@@ -32,11 +32,11 @@ import frc.robot.subsystems.Shooter;
  * Dashboard as well for tuning.
  */
 public class ShooterTuningCommand extends CommandBase {
-  private double m_setpoint, m_tolerance;
+  private double m_setpoint;
 
   private final Shooter m_shooter;
   private final ShuffleboardTab m_myTab;
-  private NetworkTableEntry m_kpEntry, m_kiEntry, m_kdEntry, m_kfEntry, m_spEntry, m_tolEntry;
+  private NetworkTableEntry m_kpEntry, m_kiEntry, m_kdEntry, m_kfEntry, m_spEntry;
   /**
    * Creates a new PIDTuningCommand.
    */
@@ -48,8 +48,6 @@ public class ShooterTuningCommand extends CommandBase {
     m_kdEntry = m_myTab.add("kD", 0 ).withPosition(3, 3).getEntry();
     m_kfEntry = m_myTab.add("kF", 0 ).withPosition(0, 3).getEntry();
     m_spEntry = m_myTab.add("Set Point", 0 ).withPosition(4, 3).getEntry();
-    m_tolEntry = m_myTab.add("Error Tolerance", 0 ).withPosition(5, 3).getEntry();
-
     m_shooter = shooter;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(m_shooter);
@@ -63,16 +61,15 @@ public class ShooterTuningCommand extends CommandBase {
     double kd = m_kdEntry.getDouble(0);
     double kf = m_kfEntry.getDouble(0);
     m_setpoint = m_spEntry.getDouble(0);
-    m_tolerance = m_tolEntry.getDouble(0);
 
-    // m_shooter.configureVelocityPID(kp, ki, kd, kf);
+    m_shooter.configureVelocityPID(kp, ki, kd, kf);
 
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-  m_shooter.velocityPID(m_setpoint, m_tolerance);
+  m_shooter.tuneVelocityPid((int)m_setpoint);
   }
 
   // Called once the command ends or is interrupted.

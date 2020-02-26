@@ -21,40 +21,36 @@ public class Intake extends SubsystemBase {
 		DEPLOY, STOW, DEPLOYING
 	}
 	
-  public DoubleSolenoid deploySolenoid;
-  public TalonSRX intakeMotor, conveyorMotor, indexer;
-  public DeployState deployState = DeployState.STOW;
-  private DigitalInput m_TopBeam;
-  private DigitalInput m_MiddleTopBeam;
-  private DigitalInput m_MiddleBottomBeam;
-  private DigitalInput m_BottomBeam;
-  private DigitalInput m_SendBeam; 
+  private DoubleSolenoid intakePistons;
+  private TalonSRX intakeMotor, conveyorMotor, indexer;
+  //private DeployState deployState = DeployState.STOW;
+  private DigitalInput m_TopBeam, m_MiddleTopBeam, m_MiddleBottomBeam, m_BottomBeam, m_SendBeam;
   private int shouldGoForward = 1;
+  private boolean m_intakeup;
 
-public boolean m_intakeup;
   /**
    * Creates a new Intake.
    */
   public Intake(){
     // Initialize Member Variables
-  deploySolenoid = new DoubleSolenoid(INTAKE_SOLENOID_A, INTAKE_SOLENOID_B);
-  intakeMotor = new TalonSRX(INTAKE); 
-  intakeMotor.configFactoryDefault();
-  conveyorMotor = new TalonSRX(INTAKE_CONVEYOR);
-  indexer = new TalonSRX(INTAKE_INDEXER); 
-  m_SendBeam = new DigitalInput(BEAM_BREAKER_SEND);
-  m_TopBeam = new DigitalInput(BEAM_BREAKER_RECEIVER_TOP);
-  m_MiddleTopBeam = new DigitalInput(BEAM_BREAKER_RECEIVER_MIDDLETOP);
-  m_MiddleBottomBeam = new DigitalInput(BEAM_BREAKER_RECEIVER_MIDDLEBOTTOM);
-  m_BottomBeam = new DigitalInput(BEAM_BREAKER_RECEIVER_BOTTOM);
+    intakePistons = new DoubleSolenoid(INTAKE_SOLENOID_A, INTAKE_SOLENOID_B);
+    intakeMotor = new TalonSRX(INTAKE); 
+    intakeMotor.configFactoryDefault();
+    conveyorMotor = new TalonSRX(INTAKE_CONVEYOR);
+    indexer = new TalonSRX(INTAKE_INDEXER); 
+    m_SendBeam = new DigitalInput(BEAM_BREAKER_SEND);
+    m_TopBeam = new DigitalInput(BEAM_BREAKER_RECEIVER_TOP);
+    m_MiddleTopBeam = new DigitalInput(BEAM_BREAKER_RECEIVER_MIDDLETOP);
+    m_MiddleBottomBeam = new DigitalInput(BEAM_BREAKER_RECEIVER_MIDDLEBOTTOM);
+    m_BottomBeam = new DigitalInput(BEAM_BREAKER_RECEIVER_BOTTOM);
 
-  Shuffleboard.getTab("Intake").add("Solenoid", deploySolenoid);
-  Shuffleboard.getTab("Intake").add("Top", m_TopBeam);
-  Shuffleboard.getTab("Intake").add("Middle Top", m_MiddleTopBeam);
-  Shuffleboard.getTab("Intake").add("Middle Bottom", m_MiddleBottomBeam);
-  Shuffleboard.getTab("Intake").add("Bottom Beam", m_BottomBeam);
-  Shuffleboard.getTab("Intake").add("Send", m_SendBeam);
-  Shuffleboard.getTab("Intake").add("Intake UP", m_intakeup);
+    Shuffleboard.getTab("Intake").add("Solenoid", intakePistons);
+    Shuffleboard.getTab("Intake").add("Top", m_TopBeam);
+    Shuffleboard.getTab("Intake").add("Middle Top", m_MiddleTopBeam);
+    Shuffleboard.getTab("Intake").add("Middle Bottom", m_MiddleBottomBeam);
+    Shuffleboard.getTab("Intake").add("Bottom Beam", m_BottomBeam);
+    Shuffleboard.getTab("Intake").add("Send", m_SendBeam);
+    Shuffleboard.getTab("Intake").add("Intake UP", m_intakeup);
  
 
   }
@@ -82,10 +78,10 @@ public boolean m_intakeup;
   }
   
   public void IntakeUP(){
-    deploySolenoid.set(DoubleSolenoid.Value.kReverse);
+    intakePistons.set(INTAKE_UP_POSITION);
   }
   public void IntakeDown() {
-    deploySolenoid.set(DoubleSolenoid.Value.kForward);
+    intakePistons.set(INTAKE_DOWN_POSITION);
   }  
 
 
@@ -96,6 +92,10 @@ public boolean m_intakeup;
       this.shouldGoForward = -1;
     }
   }
+
+
+public void shootBalls() {
+}
 
 }
 

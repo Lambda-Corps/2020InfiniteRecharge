@@ -7,7 +7,7 @@
 
 package frc.robot;
 
-import static frc.robot.Constants.DRIVER_REMOTE_PORT;
+import static frc.robot.Constants.*;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
@@ -28,6 +28,7 @@ import frc.robot.commands.Drive_Backwards;
 import frc.robot.commands.EditTalonSpeeds;
 import frc.robot.commands.ExtendClimberSolenoid;
 import frc.robot.commands.RetractClimberSolenoid;
+import frc.robot.commands.ToggleIntake;
 import frc.robot.commands.TurnMM;
 import frc.robot.commands.Autonomous.DriveOffLine;
 import frc.robot.commands.Autonomous.Pos1;
@@ -35,6 +36,8 @@ import frc.robot.commands.Autonomous.Pos2_90;
 import frc.robot.commands.Autonomous.Pos3_45;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.DriveTrain;
+import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Vision;
 /**
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -47,13 +50,15 @@ public class RobotContainer {
   private final DriveTrain m_drive_train = new DriveTrain();
   private final Vision m_vision = new Vision();
   private final Climber m_climber = new Climber();
+  private final Intake m_intake = new Intake();
+  private final Shooter m_shooter = new Shooter();
   //private final ColorWheel m_cColorWheel;
 
   // Shuffleboard Info is the container for all the shuffleboard pieces we want to see
   private ShuffleboardInfo m_sbi_instance;
   // The robot's operator interface functionality goes here
   private final XboxController m_driver_controller = new XboxController(DRIVER_REMOTE_PORT);
-  private JoystickButton driver_RB, driver_A, driver_X, driver_lb, Driver_start, Driver_back; 
+  private JoystickButton driver_RB, driver_A, /*driver_X, */driver_LB, driver_Start, driver_Back; 
 
   
   //private DefaultIntakeCommand m_dDefaultIntakeCommand;
@@ -66,9 +71,9 @@ public class RobotContainer {
    */
   public RobotContainer() {
     m_auto_chooser = new SendableChooser<Command>();
-    m_auto_chooser.addOption("Position 1 Auto", new Pos1(m_drive_train));
-    m_auto_chooser.addOption("Positon 2 Auto", new Pos2_90(m_drive_train));
-    m_auto_chooser.addOption("Position 3 Auto", new Pos3_45(m_drive_train));
+    m_auto_chooser.addOption("Position 1 Auto", new Pos1(m_drive_train, m_vision, m_shooter, m_intake));
+    m_auto_chooser.addOption("Positon 2 Auto", new Pos2_90(m_drive_train, m_vision, m_shooter, m_intake));
+    m_auto_chooser.addOption("Position 3 Auto", new Pos3_45(m_drive_train, m_vision, m_shooter, m_intake));
     m_auto_chooser.addOption("Drive Off of the Initiation Line", new DriveOffLine(m_drive_train));
 
     // Set the default commands for the subsystems
@@ -94,12 +99,12 @@ public class RobotContainer {
     driver_RB.whenHeld(new Drive_Backwards(m_drive_train, m_driver_controller));
     driver_A = new JoystickButton(m_driver_controller, 1);
     driver_A.whenHeld(new AlignWithVision(m_drive_train, m_vision));
-    driver_lb = new JoystickButton(m_driver_controller, XboxController.Button.kBumperLeft.value);
-    //driver_lb.whenPressed(new ToggleIntake());
-    Driver_start = new JoystickButton(m_driver_controller,XboxController.Button.kStart.value);
-    Driver_start.whenPressed(new ClimberUp(m_climber));
-    Driver_back = new JoystickButton(m_driver_controller,XboxController.Button.kBack.value);
-    Driver_back.whenPressed(new ClimbAndLock(m_climber));
+    driver_LB = new JoystickButton(m_driver_controller, XboxController.Button.kBumperLeft.value);
+    driver_LB.whenPressed(new ToggleIntake(m_intake));
+    driver_Start = new JoystickButton(m_driver_controller,XboxController.Button.kStart.value);
+    driver_Start.whenPressed(new ClimberUp(m_climber));
+    driver_Back = new JoystickButton(m_driver_controller,XboxController.Button.kBack.value);
+    driver_Back.whenPressed(new ClimbAndLock(m_climber));
     
 
 
@@ -128,7 +133,7 @@ public class RobotContainer {
 
   @SuppressWarnings("unused")
   private void setupAutonomousShuffleboard(){
-    SmartDashboard.putData("Autonomous", new Pos1(m_drive_train));
+    SmartDashboard.putData("Autonomous", new Pos1(m_drive_train, m_vision, m_shooter, m_intake));
     
   }
 

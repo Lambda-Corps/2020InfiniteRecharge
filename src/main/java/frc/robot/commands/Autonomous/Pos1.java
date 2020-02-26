@@ -10,10 +10,11 @@ package frc.robot.commands.Autonomous;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
-import frc.robot.commands.AlignWithVision;
 import frc.robot.commands.DriveMM;
+import frc.robot.commands.RotateToTarget;
 import frc.robot.commands.TurnMM;
 import frc.robot.subsystems.DriveTrain;
+import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Vision;
 
@@ -27,8 +28,8 @@ public class Pos1 extends SequentialCommandGroup {
   public Pos1(DriveTrain driveTrain, Vision vision, Shooter shooter, Intake intake) {
     // Add your commands in the super() call, e.g.
     // super(new FooCommand(), new BarCommand());
-    super();
-    addCommands(
+    super(//);
+    //addCommands(
       parallel(
         new DriveMM(driveTrain, -82.86),
         new PrintCommand("drop intake") 
@@ -41,7 +42,7 @@ public class Pos1 extends SequentialCommandGroup {
       new WaitCommand(1),
       new DriveMM(driveTrain, 200), 
       new TurnMM(driveTrain, -90),
-      //new AlignWithVision(driveTrain, vision),
+      new RotateToTarget(vision, driveTrain),
       new PrintCommand("shoot 5 balls")
     );
       
