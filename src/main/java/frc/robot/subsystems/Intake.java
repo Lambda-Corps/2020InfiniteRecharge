@@ -23,7 +23,7 @@ public class Intake extends SubsystemBase {
 	
   private DoubleSolenoid intakePistons;
   private TalonSRX intakeMotor, conveyorMotor, indexer;
-  private DeployState intakeDeploymentState = DeployState.STOW;
+  private DeployState intakeDeploymentState;
   private DigitalInput m_TopBeam, m_MiddleTopBeam, m_MiddleBottomBeam, m_BottomBeam, m_SendBeam;
   private boolean m_intakeup;
 
@@ -55,7 +55,8 @@ public class Intake extends SubsystemBase {
     Shuffleboard.getTab("Intake").add("Send", m_SendBeam);
     Shuffleboard.getTab("Intake").add("Intake UP", m_intakeup);
  
-
+    intakePistons.set(INTAKE_UP_POSITION);
+    intakeDeploymentState = DeployState.STOW;
   }
   
   // Public method for commands to start the motors in reverse to eject balls
@@ -76,7 +77,7 @@ public class Intake extends SubsystemBase {
     
 
     // TODO check whether beam breaks are true or false when something is detected
-    if(! m_TopBeam.get() ){
+    if( m_TopBeam.get() ){
       conveyorMotor.set(ControlMode.PercentOutput, CONVEYOR_SPEED);
     }
     else{
@@ -88,16 +89,16 @@ public class Intake extends SubsystemBase {
     // pulling more balls in as we'll likely just end up with balls stuck 
     // in the intake.
     int beamCount = 0;
-    if( m_TopBeam.get() ){
+    if( !m_TopBeam.get() ){
       beamCount++;
     }
-    if( m_MiddleTopBeam.get() ){
+    if( !m_MiddleTopBeam.get() ){
       beamCount++;
     }
-    if( m_MiddleBottomBeam.get() ){
+    if(! m_MiddleBottomBeam.get() ){
       beamCount++;
     }
-    if( m_BottomBeam.get() ){
+    if( !m_BottomBeam.get() ){
       beamCount++;
     }
 

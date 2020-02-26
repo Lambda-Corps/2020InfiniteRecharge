@@ -49,7 +49,7 @@ public final class Constants {
 
     // Talons
     public static final int CLIMBER_MOTOR          = 1;
-    public static final int INTAKE_CONVEYOR        = 2;
+    public static final int INTAKE_INDEXER         = 2;       // This Motor 
     public static final int LEFT_TALON_LEADER      = 3;
     public static final int LEFT_TALON_FOLLOWER    = 4;
     public static final int RIGHT_TALON_LEADER     = 5;
@@ -57,8 +57,9 @@ public final class Constants {
     public static final int COLOR_WHEEL_TALON      = 7; // this is spinning the Motor
     public static final int BOTTOM_SHOOTER         = 8;
     public static final int TOP_SHOOTER            = 9;
-    public static final int INTAKE                 = 10;   //This Talon controls the motor 
-    public static final int INTAKE_INDEXER         = 11;       // This Motor 
+    public static final int INTAKE_CONVEYOR        = 10;
+    public static final int INTAKE                 = 11;   //This Talon controls the motor 
+    
     public static final int UNUSED                 = 12; 
 
     // DriveTrain Configuration Constants
@@ -139,6 +140,6 @@ public final class Constants {
    public static int CONVEYOR_SPEED = 1;
    public static double INTAKE_SPEED = -.7;
    public static double INDEXER_SPEED = .7;  
-   public static final Value INTAKE_UP_POSITION = Value.kReverse;
-   public static final Value INTAKE_DOWN_POSITION = Value.kForward;
+   public static final Value INTAKE_UP_POSITION = Value.kForward;
+   public static final Value INTAKE_DOWN_POSITION = Value.kReverse;
 }
