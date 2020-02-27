@@ -70,7 +70,7 @@ public class Shooter extends SubsystemBase {
     
     // Setup the open loop limits so the drivers can't mess it up
     shooterConfig.peakOutputReverse = 0;
-    shooterConfig.peakOutputForward = .5;
+    shooterConfig.peakOutputForward = 0.75;
     shooterConfig.nominalOutputForward = 0;
 
     m_topShooter.configAllSettings(shooterConfig);

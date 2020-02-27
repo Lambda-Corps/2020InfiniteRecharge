@@ -88,7 +88,7 @@ public final class Constants {
     public final static Gains kGains_DriveMM = new Gains( 4.75, 0.0, 0.0, 0.177850,          100,  1.00 );
     public final static Gains kGains_TurnMM_small = new Gains( 4.75, 0.0,  20, 0.09590625,   200,  1.00 );
     public final static Gains kGains_TurnMM_big   = new Gains( 0.85, 0.0,  20, 0.09590625,   200,  1.00 );
-    public final static Gains kGains_Shooter = new Gains( 0.1, 0.0, 20.0, 1023.0/6800.0,  300,  0.50 );
+    public final static Gains kGains_Shooter = new Gains( 0.1, 0.0, 20.0, 1023.0/6800.0,  300,  0.75 );
     public final static Gains kGains_MotProf = new Gains( 1.0, 0.0,  0.0, 1023.0/3200.0,  400,  1.00 );
     public final static int kTimeoutMs = 5;
 
