@@ -7,11 +7,10 @@
 
 package frc.robot.commands.Autonomous;
 
-import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.DriveMM;
 import frc.robot.commands.RotateToTarget;
+import frc.robot.commands.ShootFromInitiationLine;
 import frc.robot.commands.TurnMM;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.Intake;
@@ -30,20 +29,20 @@ public class Pos1 extends SequentialCommandGroup {
     // super(new FooCommand(), new BarCommand());
     super(//);
     //addCommands(
+      // TODO add timeouts to the relevant calls to make sure we don't get stuck
       parallel(
         new DriveMM(driveTrain, -82.86),
-        new PrintCommand("drop intake") 
+        new AutoIntakeDown(intake, false)
       ),
       parallel(
         new DriveMM(driveTrain, 82.86),
-        new PrintCommand("raise intake")
+        new AutoIntakeUp(intake)
       ),
-      new TurnMM(driveTrain, 90),
-      new WaitCommand(1),
+      new TurnMM(driveTrain, 90).withTimeout(1),
       new DriveMM(driveTrain, 200), 
       new TurnMM(driveTrain, -90),
-      new RotateToTarget(vision, driveTrain),
-      new PrintCommand("shoot 5 balls")
+      new RotateToTarget(vision, driveTrain).withTimeout(.1), // TODO fix after calibrating command
+      new ShootFromInitiationLine(shooter, intake).withTimeout(4)
     );
       
     

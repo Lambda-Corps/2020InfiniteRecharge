@@ -119,6 +119,11 @@ public class Intake extends SubsystemBase {
 
   }
 
+  public void turnOnIndexerAndIntakeOnly(){
+    intakeMotor.set(ControlMode.PercentOutput, INTAKE_SPEED);
+    indexer.set(ControlMode.PercentOutput, INDEXER_SPEED);
+  }
+
   public void stopMotors(){
     indexer.set(ControlMode.PercentOutput, 0);
     intakeMotor.set(ControlMode.PercentOutput, 0);

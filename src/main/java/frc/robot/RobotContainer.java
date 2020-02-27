@@ -11,6 +11,7 @@ import static frc.robot.Constants.*;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -19,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 //import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 //import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.calibration.PIDTuningCommand;
+import frc.robot.calibration.ShooterTuningCommand;
 import frc.robot.commands.AlignWithVision;
 import frc.robot.commands.ClimbAndLock;
 import frc.robot.commands.ClimberDown;
@@ -39,9 +41,6 @@ import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Vision;
-import edu.wpi.first.wpilibj.shuffleboard.WidgetType;
-import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
-import frc.robot.calibration.ShooterTuningCommand;
 /**
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
  * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
@@ -110,10 +109,7 @@ public class RobotContainer {
     driver_Start.whenPressed(new ClimberUp(m_climber));
     driver_Back = new JoystickButton(m_driver_controller,XboxController.Button.kBack.value);
     driver_Back.whenPressed(new ClimbAndLock(m_climber));
-    
-
-
-    }
+  }
 
 
   /**
