@@ -88,7 +88,6 @@ public final class Constants {
     public final static Gains kGains_DriveMM = new Gains( 4.75, 0.0, 0.0, 0.177850,          100,  1.00 );
     public final static Gains kGains_TurnMM_small = new Gains( 4.75, 0.0,  20, 0.09590625,   200,  1.00 );
     public final static Gains kGains_TurnMM_big   = new Gains( 0.85, 0.0,  20, 0.09590625,   200,  1.00 );
-    public final static Gains kGains_Shooter = new Gains( 0.1, 0.0, 20.0, 1023.0/6800.0,  300,  0.75 );
     public final static Gains kGains_MotProf = new Gains( 1.0, 0.0,  0.0, 1023.0/3200.0,  400,  1.00 );
     public final static int kTimeoutMs = 5;
 
@@ -130,9 +129,11 @@ public final class Constants {
     public static final int SHOOTER_SLOT_INITIATION_LINE = 0;
     public static final int SHOOTER_SLOT_PORTWALL        = 1;
     public static final int SHOOTER_SLOT_FRONT_TRENCH    = 2;
-    public static final Gains kGains_InitiationLine = new Gains(0,0,0,0,100, .5);
-    public static final Gains kGains_PortWall = new Gains(0,0,0,0,200, .5);
-    public static final Gains kGains_FrontTrench = new Gains(0,0,0,0,300, .5);
+    // TODO MUST BE TUNED THURSDAY
+    /*                                                           kp,  ki,  kd,  kf,   iz,  peak output*/
+    public static final Gains kGains_InitiationLine = new Gains(0.14,  0, 1.4, .059, 100, 1.00);  // Calculated originally with 13000 as target rpm
+    public static final Gains kGains_PortWall       = new Gains(0,0,0,0,200, 1.0);
+    public static final Gains kGains_FrontTrench    = new Gains(0,0,0,0,300, 1.0);
     public static final Value SHOOTER_WALL_SHOT = Value.kForward;
     public static final Value SHOOTER_FAR_SHOT = Value.kReverse;
 
