@@ -32,10 +32,10 @@ public final class Constants {
     public static final int BOTTEM_LIMIT_SWITCH  = 0;
     public static final int BOTTOM_LIMIT_SWITCH  = 0;
     public static final int BEAM_BREAKER_SEND    = 4;
-    public static final int BEAM_BREAKER_RECEIVER_TOP   = 3;
-    public static final int BEAM_BREAKER_RECEIVER_MIDDLETOP = 5;
-    public static final int BEAM_BREAKER_RECEIVER_MIDDLEBOTTOM    = 6;
-    public static final int BEAM_BREAKER_RECEIVER_BOTTOM    = 7;
+    public static final int BEAM_BREAKER_RECEIVER_TOP   = 8;
+    public static final int BEAM_BREAKER_RECEIVER_MIDDLETOP = 7;
+    public static final int BEAM_BREAKER_RECEIVER_MIDDLEBOTTOM    = 9;
+    public static final int BEAM_BREAKER_RECEIVER_BOTTOM    = 6;
     
     // Solenoids
     public static final int GEARBOX_SOLENOID_A = 0;
