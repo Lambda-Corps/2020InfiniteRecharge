@@ -39,11 +39,12 @@ public class ShooterTuningCommand extends CommandBase {
 
   private final Shooter m_shooter;
   private final ShuffleboardTab m_myTab;
-  private NetworkTableEntry m_kpEntry, m_kiEntry, m_kdEntry, m_kfEntry, m_spEntry, m_conveyorEntry, m_conveyorDelayEntry, m_IntakeEntry, m_IndexerEntry, m_runTimeEntry;
+  private NetworkTableEntry m_kpEntry, m_kiEntry, m_kdEntry, m_kfEntry, m_spEntry;//, m_conveyorEntry, m_conveyorDelayEntry, m_IntakeEntry, m_IndexerEntry, m_runTimeEntry;
   /**
    * Creates a new PIDTuningCommand.
    */
   public ShooterTuningCommand(Shooter shooter, Intake intake) {
+    m_runTime = 2;
     cmdTimer = new Timer();
     m_myTab = Shuffleboard.getTab("PID Tuning");
 
@@ -83,7 +84,7 @@ public class ShooterTuningCommand extends CommandBase {
   public void execute() {
     m_shooter.tuneVelocityPid((int)m_setpoint);
 
-    if(cmdTimer.get() >= 2){
+    if(cmdTimer.get() >= m_runTime){
       m_Intake.shootBalls();
     }
     

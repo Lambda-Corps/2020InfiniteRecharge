@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.ShuffleboardInfo;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.Vision;
-
+import static frc.robot.Constants.*;
 public class RotateToTarget extends CommandBase {
 
   private final Vision m_vision;
@@ -40,7 +40,18 @@ public class RotateToTarget extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    double right = m_vision.getTX()* m_steeringKP; // Right X
+    double right = 0;
+
+    double tx = m_vision.getTX();
+    if (tx < VISION_TX_TOLOERANCE && tx > -VISION_TX_TOLOERANCE) {
+      right = 0;
+    
+    }else {
+      right = tx * m_steeringKP;
+    }
+    // double right = m_vision.getTX()* m_steeringKP; 
+    // if (right < .15 && )
+    // // Right X
 
     m_dt.teleop_drive(0, right);
   }

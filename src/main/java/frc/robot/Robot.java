@@ -54,6 +54,8 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void disabledInit() {
+    CommandScheduler.getInstance().cancelAll();
+    m_robotContainer.stopAllMotors();
   }
 
   @Override

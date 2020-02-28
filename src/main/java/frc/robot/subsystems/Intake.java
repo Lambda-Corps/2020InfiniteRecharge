@@ -7,14 +7,32 @@
 
 package frc.robot.subsystems;
 
-import static frc.robot.Constants.*;
+import static frc.robot.Constants.BEAM_BREAKER_RECEIVER_BOTTOM;
+import static frc.robot.Constants.BEAM_BREAKER_RECEIVER_MIDDLEBOTTOM;
+import static frc.robot.Constants.BEAM_BREAKER_RECEIVER_MIDDLETOP;
+import static frc.robot.Constants.BEAM_BREAKER_RECEIVER_TOP;
+import static frc.robot.Constants.BEAM_BREAKER_SEND;
+import static frc.robot.Constants.CONVEYOR_SPEED;
+import static frc.robot.Constants.INDEXER_SPEED;
+import static frc.robot.Constants.INTAKE;
+import static frc.robot.Constants.INTAKE_CONVEYOR;
+import static frc.robot.Constants.INTAKE_DOWN_POSITION;
+import static frc.robot.Constants.INTAKE_INDEXER;
+import static frc.robot.Constants.INTAKE_SOLENOID_A;
+import static frc.robot.Constants.INTAKE_SOLENOID_B;
+import static frc.robot.Constants.INTAKE_SPEED;
+import static frc.robot.Constants.INTAKE_UP_POSITION;
+
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 //make deploy intake, retract intake= put on smartdashboard
+import frc.robot.ShuffleboardInfo;
 
 public class Intake extends SubsystemBase {
   public enum DeployState {
@@ -27,10 +45,20 @@ public class Intake extends SubsystemBase {
   private DigitalInput m_TopBeam, m_MiddleTopBeam, m_MiddleBottomBeam, m_BottomBeam, m_SendBeam;
   private boolean m_intakeup;
 
+  private final NetworkTableEntry m_top_entry, m_3rd_entry, m_2nd_entry, m_bottom_entry;
+
+  int count = 0;
+
   /**
    * Creates a new Intake.
    */
   public Intake(){
+    ShuffleboardInfo instance = ShuffleboardInfo.getInstance();
+    m_top_entry = instance.getTopBeamEntry();
+    m_3rd_entry = instance.get3rdBeamEntry();
+    m_2nd_entry = instance.get2ndBeamEntry();
+    m_bottom_entry = instance.getBottomBeamEntry();
+
     // Initialize Member Variables
     intakePistons = new DoubleSolenoid(INTAKE_SOLENOID_A, INTAKE_SOLENOID_B);
 
@@ -58,10 +86,20 @@ public class Intake extends SubsystemBase {
     intakePistons.set(INTAKE_UP_POSITION);
     intakeDeploymentState = DeployState.STOW;
   }
+
+  @Override
+  public void periodic(){
+    m_top_entry.forceSetBoolean(!m_TopBeam.get());
+    m_3rd_entry.forceSetBoolean(!m_MiddleTopBeam.get());
+    m_2nd_entry.forceSetBoolean(!m_MiddleBottomBeam.get());
+    m_bottom_entry.forceSetBoolean(!m_BottomBeam.get());
+  }
   
   // Public method for commands to start the motors in reverse to eject balls
   public void EjectBalls(){
-    intakeMotor.set(ControlMode.PercentOutput, -.5);
+    intakeMotor.set(ControlMode.PercentOutput, -INTAKE_SPEED);
+    indexer.set(ControlMode.PercentOutput, -INDEXER_SPEED);
+    conveyorMotor.set(ControlMode.PercentOutput, -CONVEYOR_SPEED);
   }
   
   public void pullIntakeUp(){
@@ -73,16 +111,16 @@ public class Intake extends SubsystemBase {
     intakeDeploymentState = DeployState.DEPLOY;
   }  
 
-  public void pullInBalls(){
+  public boolean pullInBalls(){
     
-
-    // TODO check whether beam breaks are true or false when something is detected
-    if( m_TopBeam.get() ){
-      conveyorMotor.set(ControlMode.PercentOutput, CONVEYOR_SPEED);
-    }
-    else{
-      conveyorMotor.set(ControlMode.PercentOutput, 0);
-    }
+    conveyorMotor.set(ControlMode.PercentOutput, m_TopBeam.get() ? CONVEYOR_SPEED : 0.0);
+    // if( m_TopBeam.get() ){
+    //   SmartDashboard.putNumber("Beam True Count", count++);
+    //   conveyorMotor.set(ControlMode.PercentOutput, CONVEYOR_SPEED);
+    // }
+    // else{
+    //   conveyorMotor.set(ControlMode.PercentOutput, 0);
+    // }
 
     // Count how many beam breakers are detecting balls.  If all four of 
     // them  are full, we should probably stop the intake motors from
@@ -95,21 +133,28 @@ public class Intake extends SubsystemBase {
     if( !m_MiddleTopBeam.get() ){
       beamCount++;
     }
-    if(! m_MiddleBottomBeam.get() ){
-      beamCount++;
-    }
+    // if(! m_MiddleBottomBeam.get() ){
+    //   beamCount++;
+    // }
     if( !m_BottomBeam.get() ){
       beamCount++;
     }
 
-    if( beamCount < 4 ){
+    if( beamCount < 3 ){
       // This means that not all the beams are broken, and the top already checked that
       // we don't have a ball in there, so keep the conveyor, indexer, and intake going.
       intakeMotor.set(ControlMode.PercentOutput, INTAKE_SPEED);
       indexer.set(ControlMode.PercentOutput, INDEXER_SPEED);
     } else{
-      stopMotors();
+      return true;
     }
+
+    if(!m_TopBeam.get()){
+      return true;
+    }
+
+    // else
+    return false;
   }
 
   public void shootBalls() {
@@ -132,6 +177,14 @@ public class Intake extends SubsystemBase {
 
   public DeployState getIntakeState(){
     return intakeDeploymentState;
+  }
+
+  public boolean keepShooting() {
+    return false;
+  }
+
+  public boolean conveyorColumnEmpty(){
+    return ( m_TopBeam.get() && m_MiddleTopBeam.get() && m_MiddleBottomBeam.get() && m_BottomBeam.get() );
   }
 }
 

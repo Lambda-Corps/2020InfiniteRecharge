@@ -7,62 +7,50 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Intake;
-import frc.robot.subsystems.Intake.DeployState;
 
-
-public class ToggleIntake extends CommandBase {
-  private Intake m_intake;
-  private DeployState m_intake_state;
-  boolean m_isDone;
-  
-
+public class DefaultIntakeCommand extends CommandBase {
+  private final Intake m_intake;
+  private final XboxController m_partner_controller;
   /**
-   * Creates a new IntakeUp.
+   * Creates a new DefaultIntakeCommand.
    */
-  public ToggleIntake(Intake intake) {
+  public DefaultIntakeCommand(Intake intake, XboxController controller) {
     m_intake = intake;
-    m_isDone = false;
-    addRequirements(intake);
+    m_partner_controller = controller;
     // Use addRequirements() here to declare subsystem dependencies.
+    addRequirements(m_intake);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_intake_state = m_intake.getIntakeState();
-    if( m_intake_state == DeployState.DEPLOY ){
-      m_intake.pullIntakeUp();
-    }
-    else if( m_intake_state == DeployState.STOW ){
-      m_intake.putIntakeDown();
-    }
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_intake_state = m_intake.getIntakeState();
-    if( m_intake_state == DeployState.DEPLOY ){
-      m_isDone = m_intake.pullInBalls();
+    // Values should be from 0 - 1 on the triggers
+
+    double rightTrigger = m_partner_controller.getRawAxis(XboxController.Axis.kRightTrigger.value);
+    if( rightTrigger > .5 ){
+      m_intake.EjectBalls();
     }
     else{
-      m_isDone = true;
+       m_intake.stopMotors();
     }
   }
-
-
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_intake.stopMotors();
   }
 
-  // Returns returns true automatically after settting the states
+  // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return m_isDone;
+    return false;
   }
 }

@@ -86,8 +86,8 @@ public final class Constants {
      * 
      *                                                    kP   kI   kD   kF               Iz    PeakOut */
     public final static Gains kGains_DriveMM = new Gains( 4.75, 0.0, 0.0, 0.177850,          100,  1.00 );
-    public final static Gains kGains_TurnMM_small = new Gains( 4.75, 0.0,  20, 0.09590625,   200,  1.00 );
-    public final static Gains kGains_TurnMM_big   = new Gains( 0.85, 0.0,  20, 0.09590625,   200,  1.00 );
+    //public final static Gains kGains_TurnMM_small = new Gains( 4.75, 0.0,  20, 0.09590625,   200,  1.00 );
+    public final static Gains kGains_TurnMM_big   = new Gains( 1.3, 0.0,  0, 0.177850,   200,  1.00 );
     public final static Gains kGains_MotProf = new Gains( 1.0, 0.0,  0.0, 1023.0/3200.0,  400,  1.00 );
     public final static int kTimeoutMs = 5;
 
@@ -104,8 +104,8 @@ public final class Constants {
     public final static int SLOT_2 = 2;
     public final static int SLOT_3 = 3;
     public static final int DT_SLOT_DRIVE_MM = SLOT_0;
-    public static final int DT_SLOT_AUXILIARY_PID = SLOT_1;
-    public static final int DT_SLOT_TURN_MM = SLOT_2;
+    public static final int DT_SLOT_AUXILIARY_PID = SLOT_2;
+    public static final int DT_SLOT_TURN_MM = SLOT_1;
     public static final int DT_SLOT_MOTION_PROFILE = SLOT_3;
 
     //Color wheel
@@ -120,27 +120,30 @@ public final class Constants {
     public static final int    CLIMBER_CURRENT_LIMIT = 25;
 
     //shooter
-    public static final int SHOOTER_SETPOINT_WALL = 9000;
-    public static final int SHOOTER_SETPOINT_LINE = 9000;
-    public static final int SHOOTER_SETPOINT_TRENCH = 9000;
+    public static final int SHOOTER_SETPOINT_WALL = 7500;
+    public static final int SHOOTER_SETPOINT_LINE = 12300;
+    public static final int SHOOTER_SETPOINT_TRENCH = 13000;
     public static final double SHOOTER_RAMP_TIME = 1.0;
     public static final int RUNTIME = 5;
     // Each shooting distance may have different gains to make it work
     public static final int SHOOTER_SLOT_INITIATION_LINE = 0;
     public static final int SHOOTER_SLOT_PORTWALL        = 1;
     public static final int SHOOTER_SLOT_FRONT_TRENCH    = 2;
-    // TODO MUST BE TUNED THURSDAY
     /*                                                           kp,  ki,  kd,  kf,   iz,  peak output*/
-    public static final Gains kGains_InitiationLine = new Gains(0.14,  0, 1.4, .059, 100, 1.00);  // Calculated originally with 13000 as target rpm
-    public static final Gains kGains_PortWall       = new Gains(0,0,0,0,200, 1.0);
-    public static final Gains kGains_FrontTrench    = new Gains(0,0,0,0,300, 1.0);
+    public static final Gains kGains_InitiationLine = new Gains(1.6,  0, 0, .075, 100,  1.00);  // Calculated originally with 13000 as target rpm
+    public static final Gains kGains_PortWall       = new Gains(.1023, 0,  0, 0.10,200, 1.00);
+    public static final Gains kGains_FrontTrench    = new Gains(1.6,  0, 0, .075, 300,  1.00);
     public static final Value SHOOTER_WALL_SHOT = Value.kForward;
     public static final Value SHOOTER_FAR_SHOT = Value.kReverse;
 
    //Intake
-   public static int CONVEYOR_SPEED = 1;
+   public static double CONVEYOR_SPEED = .4;
    public static double INTAKE_SPEED = -.7;
    public static double INDEXER_SPEED = .7;  
    public static final Value INTAKE_UP_POSITION = Value.kForward;
    public static final Value INTAKE_DOWN_POSITION = Value.kReverse;
+
+   // vision
+   public static final double VISION_TX_TOLOERANCE = 1;
+
 }

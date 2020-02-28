@@ -10,21 +10,23 @@ package frc.robot.commands.autonomous;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.DriveMM;
 import frc.robot.subsystems.DriveTrain;
+import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.Shooter.ShotDistance;
 
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
 // https://docs.wpilib.org/en/latest/docs/software/commandbased/convenience-features.html
-public class DriveOffLine extends SequentialCommandGroup {
+public class DriveAndShootFromPortWall extends SequentialCommandGroup {
   /**
-   * Creates a new DriveOffLine.
+   * Creates a new ShootFromPortWall.
    */
-  public DriveOffLine(DriveTrain driveTrain) {
+  public DriveAndShootFromPortWall(DriveTrain driveTrain, Shooter shooter, Intake intake) {
     // Add your commands in the super() call, e.g.
     // super(new FooCommand(), new BarCommand());
-    super();
     addCommands(
-      new DriveMM(driveTrain, 25) 
-      //can be easily made to be smaller or bigger for however much it needs to be off of the line
+      new DriveMM(driveTrain, 83.5).withTimeout(9), 
+      new AutoShootMax4Seconds(shooter, intake, ShotDistance.PortWall)
     );
   }
 }

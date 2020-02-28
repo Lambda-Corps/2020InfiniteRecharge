@@ -135,7 +135,7 @@ public class Shooter extends SubsystemBase {
         // Set the setpoint
         m_shooter_set_point = SHOOTER_SETPOINT_WALL;
         // Set the pistons
-        m_hood.set(SHOOTER_FAR_SHOT);
+        m_hood.set(SHOOTER_WALL_SHOT);
         break;
       case FrontTrench:
         // Config the shooter for initiation line

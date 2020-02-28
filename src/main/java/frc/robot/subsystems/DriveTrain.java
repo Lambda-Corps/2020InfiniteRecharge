@@ -290,12 +290,6 @@ public class DriveTrain extends SubsystemBase {
   }
 
   public void motion_magic_start_config_turn(double degrees){
-    if( degrees > 45 ){
-      // config big
-    }
-    else {
-      // config small
-    }
     m_leftLeader.selectProfileSlot(DT_SLOT_TURN_MM, PID_PRIMARY);
     m_rightLeader.selectProfileSlot(DT_SLOT_TURN_MM, PID_PRIMARY);
     m_leftLeader.configMotionCruiseVelocity(3000, kTimeoutMs);

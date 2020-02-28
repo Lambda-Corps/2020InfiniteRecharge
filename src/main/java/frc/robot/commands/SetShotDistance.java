@@ -5,26 +5,20 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package frc.robot.commands.autonomous;
+package frc.robot.commands;
 
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import frc.robot.commands.DriveMM;
-import frc.robot.subsystems.DriveTrain;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
 // https://docs.wpilib.org/en/latest/docs/software/commandbased/convenience-features.html
-public class DriveOffLine extends SequentialCommandGroup {
-  /**
-   * Creates a new DriveOffLine.
-   */
-  public DriveOffLine(DriveTrain driveTrain) {
-    // Add your commands in the super() call, e.g.
-    // super(new FooCommand(), new BarCommand());
-    super();
-    addCommands(
-      new DriveMM(driveTrain, 25) 
-      //can be easily made to be smaller or bigger for however much it needs to be off of the line
-    );
+public class SetShotDistance extends InstantCommand {
+  public SetShotDistance() {
+    // Use addRequirements() here to declare subsystem dependencies.
+  }
+
+  // Called when the command is initially scheduled.
+  @Override
+  public void initialize() {
   }
 }

@@ -47,7 +47,7 @@ public class TurnMM extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_drivetrain.disableMotorSafety();
+    //m_drivetrain.disableMotorSafety();
     /*512 ticks per 1 rotation * 54/30 * 36/12 (gearing) = ~2764.8 ticks/1 wheel rotation (2765 is rounded)
       2765 ticks per 1 rotation / (pi * 6.3125 in (wheel diameter)) = 139.416 ticks per 1 inch
       Measured wheel base is 28 inches, so to figure out inches per degree of turning we take 

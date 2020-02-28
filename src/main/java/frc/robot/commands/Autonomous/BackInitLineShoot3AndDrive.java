@@ -5,33 +5,28 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package frc.robot.commands.Autonomous;
+package frc.robot.commands.autonomous;
 
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.DriveMM;
-import frc.robot.commands.RotateToTarget;
-import frc.robot.commands.Shoot;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
-import frc.robot.subsystems.Vision;
 import frc.robot.subsystems.Shooter.ShotDistance;
 
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
 // https://docs.wpilib.org/en/latest/docs/software/commandbased/convenience-features.html
-public class ShootFromPortWall extends SequentialCommandGroup {
+public class BackInitLineShoot3AndDrive extends SequentialCommandGroup {
   /**
-   * Creates a new ShootFromPortWall.
+   * Creates a new Auto2.
    */
-  public ShootFromPortWall(DriveTrain driveTrain, Vision vision, Shooter shooter, Intake intake) {
+  public BackInitLineShoot3AndDrive(DriveTrain driveTrain, Shooter shooter, Intake intake) {
     // Add your commands in the super() call, e.g.
     // super(new FooCommand(), new BarCommand());
-    super();
     addCommands(
-      new DriveMM(driveTrain, 83.5),
-      new RotateToTarget(vision, driveTrain),
-      new Shoot(shooter, intake, ShotDistance.PortWall)
+      new AutoShootMax4Seconds(shooter, intake, ShotDistance.InitiationLine),
+      new DriveMM(driveTrain, -30)
     );
   }
 }

@@ -5,19 +5,18 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package frc.robot.commands.Autonomous;
+package frc.robot.commands.autonomous;
 
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.DriveMM;
 import frc.robot.commands.RotateToTarget;
-import frc.robot.commands.Shoot;
 import frc.robot.commands.TurnMM;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
-import frc.robot.subsystems.Vision;
 import frc.robot.subsystems.Shooter.ShotDistance;
+import frc.robot.subsystems.Vision;
 
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
@@ -31,21 +30,17 @@ public class Pos1 extends SequentialCommandGroup {
     // super(new FooCommand(), new BarCommand());
     // super(//);
     addCommands(
-      // TODO add timeouts to the relevant calls to make sure we don't get stuck
-      // parallel(
+      new ParallelCommandGroup(
         new DriveMM(driveTrain, -82.86),
-        new AutoIntakeDown(intake, false),
-      // ),
-       new WaitCommand(1),
-      // parallel(
+        new AutoIntakeDown(intake, false)),
+      new ParallelCommandGroup(
         new AutoIntakeUp(intake),
-        new DriveMM(driveTrain, 82.86),
-      // ),
+        new DriveMM(driveTrain, 82.86)),
       new TurnMM(driveTrain, 90),
       new DriveMM(driveTrain, 200), 
       new TurnMM(driveTrain, -90),
-      new RotateToTarget(vision, driveTrain).withTimeout(.1), // TODO fix after calibrating command
-      new Shoot(shooter, intake, ShotDistance.InitiationLine).withTimeout(4)
+      new RotateToTarget(vision, driveTrain),//.withTimeout(.1),
+      new AutoShootMax4Seconds(shooter, intake, ShotDistance.InitiationLine)
     );
       
     

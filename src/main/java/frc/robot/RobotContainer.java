@@ -7,7 +7,8 @@
 
 package frc.robot;
 
-import static frc.robot.Constants.*;
+import static frc.robot.Constants.DRIVER_REMOTE_PORT;
+import static frc.robot.Constants.PARTNER_REMOTE_PORT;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
@@ -22,19 +23,33 @@ import edu.wpi.first.wpilibj2.command.button.POVButton;
 //import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.calibration.PIDTuningCommand;
 import frc.robot.calibration.ShooterTuningCommand;
-import frc.robot.commands.Autonomous.DriveOffLine;
-import frc.robot.commands.Autonomous.Pos1;
-import frc.robot.commands.Autonomous.Pos2_90;
-import frc.robot.commands.Autonomous.Pos3_45;
+import frc.robot.commands.AlignWithVision;
+import frc.robot.commands.ClimbAndLock;
+import frc.robot.commands.ClimberDown;
+import frc.robot.commands.ClimberUp;
+import frc.robot.commands.DefaultDriveTrainCommand;
+import frc.robot.commands.DefaultIntakeCommand;
+import frc.robot.commands.Drive_Backwards;
+import frc.robot.commands.EditTalonSpeeds;
+import frc.robot.commands.ExtendClimberSolenoid;
+import frc.robot.commands.IntakeCancel;
+import frc.robot.commands.RetractClimberSolenoid;
+import frc.robot.commands.Shoot;
+import frc.robot.commands.ShooterCancel;
+import frc.robot.commands.ToggleIntake;
+import frc.robot.commands.TurnMM;
 import frc.robot.commands.Shifting.ToggleShifting;
 import frc.robot.commands.Shooter.SetShooterDistance;
+import frc.robot.commands.autonomous.DriveOffLine;
+import frc.robot.commands.autonomous.Pos1;
+import frc.robot.commands.autonomous.BackInitLineShoot3AndDrive;
+import frc.robot.commands.autonomous.DriveAndShootFromPortWall;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
-import frc.robot.subsystems.Vision;
 import frc.robot.subsystems.Shooter.ShotDistance;
-import frc.robot.commands.*;
+import frc.robot.subsystems.Vision;
 /**
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
  * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
@@ -54,10 +69,10 @@ public class RobotContainer {
   private ShuffleboardInfo m_sbi_instance;
   // The robot's operator interface functionality goes here
   private final XboxController m_driver_controller = new XboxController(DRIVER_REMOTE_PORT);
-  private JoystickButton driver_RB, driver_A, /*driver_X, */driver_LB, driver_Start, driver_Back, driver_stick_left, driver_r_jb;
-  private POVButton driver_POVtop, driver_POVright, driver_POVbottom, driver_POVleft; 
+  private JoystickButton driver_RB, driver_A, /*driver_X, */driver_LB, driver_Start, driver_Back, driver_stick_left;
+  private POVButton driver_POVright, driver_POVbottom; // driver_POVtop,, driver_POVleft; 
   private final XboxController m_partner_controller = new XboxController(PARTNER_REMOTE_PORT);
-  private JoystickButton partner_LB, partner_RB, partner_Start, partner_Back, partner_X, partner_Y, partner_B, partner_A;
+  private JoystickButton partner_Start, partner_Back, partner_B, partner_A; //partner_LB, partner_RB, partner_X, partner_Y, 
   
   //private DefaultIntakeCommand m_dDefaultIntakeCommand;
   //private Intake m_Intake;
@@ -69,9 +84,11 @@ public class RobotContainer {
    */
   public RobotContainer() {
     m_auto_chooser = new SendableChooser<Command>();
-    m_auto_chooser.addOption("Position 1 Auto", new Pos1(m_drive_train, m_vision, m_shooter, m_intake));
-    m_auto_chooser.addOption("Positon 2 Auto", new Pos2_90(m_drive_train, m_vision, m_shooter, m_intake));
-    m_auto_chooser.addOption("Position 3 Auto", new Pos3_45(m_drive_train, m_vision, m_shooter, m_intake));
+    m_auto_chooser.addOption("Back of Line, shoot", new BackInitLineShoot3AndDrive(m_drive_train, m_shooter, m_intake));
+    m_auto_chooser.addOption("Front of Line, drive to wall", new DriveAndShootFromPortWall(m_drive_train, m_shooter, m_intake));
+    // m_auto_chooser.addOption("Position 1 Auto", new Pos1(m_drive_train, m_vision, m_shooter, m_intake));
+    // m_auto_chooser.addOption("Positon 2 Auto", new Pos2_90(m_drive_train, m_vision, m_shooter, m_intake));
+    //m_auto_chooser.addOption("Position 3 Auto", new Pos3_45(m_drive_train, m_vision, m_shooter, m_intake));
     m_auto_chooser.addOption("Drive Off of the Initiation Line", new DriveOffLine(m_drive_train));
     
 
@@ -79,14 +96,15 @@ public class RobotContainer {
 
     // Set the default commands for the subsystems
     m_drive_train.setDefaultCommand(new DefaultDriveTrainCommand(m_drive_train, m_driver_controller));
+    m_intake.setDefaultCommand(new DefaultIntakeCommand(m_intake, m_partner_controller));
   
 
     // Configure the button bindings
     // NOTE -- This should not be called until all the subsystems have been instantiated and the 
     // default commands for them have been set.
     configureButtonBindings();
-    SmartDashboard.putData(new DriveMM(m_drive_train, -83));
-    SmartDashboard.putData(new TurnMM(m_drive_train, 90));
+    // SmartDashboard.putData(new DriveMM(m_drive_train, -83));
+    // SmartDashboard.putData(new TurnMM(m_drive_train, 90));
 
     setupShuffleBoard();
   }
@@ -118,6 +136,16 @@ public class RobotContainer {
     driver_POVbottom = new POVButton( m_driver_controller, 180);
     driver_POVbottom.whenPressed(new SetShooterDistance(m_shooter, ShotDistance.PortWall));
     // driver_POVleft = new POVButton(m_driver_controller, 270);
+    
+    //jb= joystick button
+
+    // Partner controls
+    partner_Back = new JoystickButton(m_partner_controller, XboxController.Button.kBack.value);
+    partner_Back.whenPressed(new IntakeCancel(m_intake));
+
+    partner_Start = new JoystickButton(m_partner_controller, XboxController.Button.kStart.value);
+    partner_Start.whenPressed(new ShooterCancel(m_shooter));
+
     // partner_X = new JoystickButton(m_partner_controller, XboxController.Button.kX.value);
     // partner_X.whenPressed(new );
     // partner_Y = new JoystickButton(m_partner_controller, XboxController.Button.kY.value);
@@ -134,11 +162,10 @@ public class RobotContainer {
     // partner_LB.whileHeld(new );
     // partner_RB = new JoystickButton(m_partner_controller, XboxController.Button.kBumperRight.value);
     // partner_RB.whileHeld(new );
-    //jb= joystick button
-    
 
 
-    }
+
+  }
 
 
   /**
@@ -206,5 +233,12 @@ public class RobotContainer {
 
   public void setDriveTrainToLowGear(){
     m_drive_train.setLowGear();
+  }
+
+  public void stopAllMotors() {
+    m_drive_train.stopMotors();
+    m_intake.stopMotors();
+    m_shooter.stopMotors();
+    m_climber.stopMotor();
   }
 }
