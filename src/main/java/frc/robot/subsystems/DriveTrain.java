@@ -407,7 +407,7 @@ public class DriveTrain extends SubsystemBase {
   }
 
   @SuppressWarnings("unused")
-  private boolean isLowGear(){
+  public boolean isLowGear(){
     return (m_gearbox.get() == DT_LOW_GEAR);
   }
 

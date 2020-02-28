@@ -15,19 +15,21 @@ import static frc.robot.Constants.*;
 import edu.wpi.first.wpilibj.Timer;
 
 
-public class ShootFromInitiationLine extends CommandBase {
+public class Shoot extends CommandBase {
   /**
    * Creates a new ShooterCommand.
    */
     private Shooter m_shooter;
     private Intake m_intake;
     private Timer cmdTimer;
+    private ShotDistance m_distance;
 
     
-  public ShootFromInitiationLine(Shooter shooter, Intake intake) {
+  public Shoot(Shooter shooter, Intake intake, ShotDistance distance) {
     // Use addRequirements() here to declare subsystem dependencies.
     m_shooter = shooter;
     m_intake = intake;
+    m_distance = distance;
     addRequirements(m_shooter, m_intake);
     cmdTimer = new Timer();
   }
@@ -37,15 +39,15 @@ public class ShootFromInitiationLine extends CommandBase {
   public void initialize() {
     cmdTimer.reset();
     cmdTimer.start();
-
-    m_shooter.setShotDistance(ShotDistance.InitiationLine);
+    m_shooter.setShotDistance(m_distance);
+    
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
     // Start the shooter 
-    m_shooter.shootFromDistance(ShotDistance.InitiationLine);
+    m_shooter.shootFromDistance(m_distance);
     if( cmdTimer.get() >= SHOOTER_RAMP_TIME){
       // Turn on the intake motors after the delay has been met.
       m_intake.shootBalls();
