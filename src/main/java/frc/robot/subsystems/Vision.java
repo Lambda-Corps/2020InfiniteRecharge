@@ -20,7 +20,7 @@ public class Vision extends SubsystemBase {
   private double tv, tx, ta;
   private ArrayList<Double> m_targetList;
   private final int MAX_ENTRIES = 50;
-  private final NetworkTableEntry m_isTargetValid;
+  private final NetworkTableEntry m_isTargetValid, m_led_entry;
 
 
   /**
@@ -30,6 +30,7 @@ public class Vision extends SubsystemBase {
     m_limelightTable = NetworkTableInstance.getDefault().getTable("limelight");
     m_targetList = new ArrayList<Double>(MAX_ENTRIES);
     m_isTargetValid = ShuffleboardInfo.getInstance().getTargetEntry();
+    m_led_entry = m_limelightTable.getEntry("ledMode");
   }
 
   @Override
@@ -62,5 +63,9 @@ public class Vision extends SubsystemBase {
 
   public boolean isTargetValid() {
     return (tv == 1.0); 
+  }
+
+  public void setLlLedMode(int mode){
+    m_led_entry.forceSetDouble((mode));
   }
 }

@@ -7,8 +7,7 @@
 
 package frc.robot;
 
-import static frc.robot.Constants.DRIVER_REMOTE_PORT;
-import static frc.robot.Constants.PARTNER_REMOTE_PORT;
+import static frc.robot.Constants.*;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
@@ -38,6 +37,8 @@ import frc.robot.commands.Shoot;
 import frc.robot.commands.ShooterCancel;
 import frc.robot.commands.ToggleIntake;
 import frc.robot.commands.TurnMM;
+import frc.robot.commands.TurnOffLImelightLEDs;
+import frc.robot.commands.TurnOnLimelightLEDs;
 import frc.robot.commands.Shifting.ToggleShifting;
 import frc.robot.commands.Shooter.SetShooterDistance;
 import frc.robot.commands.autonomous.DriveOffLine;
@@ -69,7 +70,7 @@ public class RobotContainer {
   private ShuffleboardInfo m_sbi_instance;
   // The robot's operator interface functionality goes here
   private final XboxController m_driver_controller = new XboxController(DRIVER_REMOTE_PORT);
-  private JoystickButton driver_RB, driver_A, /*driver_X, */driver_LB, driver_Start, driver_Back, driver_stick_left;
+  private JoystickButton driver_RB, driver_A, /*driver_X, */driver_LB, driver_Start, driver_Back, driver_stick_left, driver_stick_right;
   private POVButton driver_POVright, driver_POVbottom; // driver_POVtop,, driver_POVleft; 
   private final XboxController m_partner_controller = new XboxController(PARTNER_REMOTE_PORT);
   private JoystickButton partner_Start, partner_Back, partner_B, partner_A; //partner_LB, partner_RB, partner_X, partner_Y, 
@@ -127,7 +128,9 @@ public class RobotContainer {
     driver_Back = new JoystickButton(m_driver_controller,XboxController.Button.kBack.value);
     driver_Back.whenPressed(new ClimbAndLock(m_climber));
     driver_stick_left = new JoystickButton(m_driver_controller, XboxController.Button.kStickLeft.value);
-    driver_stick_left.whenPressed(new ToggleShifting(m_drive_train));
+    driver_stick_left.whenPressed(new TurnOffLImelightLEDs(m_vision));
+    driver_stick_right = new JoystickButton(m_driver_controller, XboxController.Button.kStickRight.value);
+    driver_stick_right.whenPressed(new TurnOnLimelightLEDs(m_vision));
     // driver_r_jb = new JoystickButton( m_driver_controller, XboxController.Button.kStickRight.value);
     // driver_POVtop = new POVButton(m_driver_controller, 0);
     // driver_POVtop.whenPressed(new SetShooterDistance(m_shooter, ShotDistance.FrontTrench));
@@ -240,5 +243,9 @@ public class RobotContainer {
     m_intake.stopMotors();
     m_shooter.stopMotors();
     m_climber.stopMotor();
+  }
+
+  public void turnOffLimelightLED(){
+    m_vision.setLlLedMode(VISION_LED_OFF);
   }
 }

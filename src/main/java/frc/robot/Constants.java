@@ -54,12 +54,12 @@ public final class Constants {
     public static final int LEFT_TALON_FOLLOWER    = 4;
     public static final int RIGHT_TALON_LEADER     = 5;
     public static final int RIGHT_TALON_FOLLOWER   = 6;
-    public static final int COLOR_WHEEL_TALON      = 7; // this is spinning the Motor
     public static final int BOTTOM_SHOOTER         = 8;
     public static final int TOP_SHOOTER            = 9;
     public static final int INTAKE_CONVEYOR        = 10;
     public static final int INTAKE                 = 11;   //This Talon controls the motor 
-    
+    // Unused
+    public static final int COLOR_WHEEL_TALON      = 7; 
     public static final int UNUSED                 = 12; 
 
     // DriveTrain Configuration Constants
@@ -145,5 +145,8 @@ public final class Constants {
 
    // vision
    public static final double VISION_TX_TOLOERANCE = 1;
+   public static final int VISION_LED_OFF = 1;
+   public static final int VISION_LED_PIPELINE = 0;
+
 
 }
