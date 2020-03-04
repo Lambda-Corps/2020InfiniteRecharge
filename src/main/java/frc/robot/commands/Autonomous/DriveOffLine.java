@@ -21,7 +21,6 @@ public class DriveOffLine extends SequentialCommandGroup {
   public DriveOffLine(DriveTrain driveTrain) {
     // Add your commands in the super() call, e.g.
     // super(new FooCommand(), new BarCommand());
-    super();
     addCommands(
       new DriveMM(driveTrain, 25) 
       //can be easily made to be smaller or bigger for however much it needs to be off of the line

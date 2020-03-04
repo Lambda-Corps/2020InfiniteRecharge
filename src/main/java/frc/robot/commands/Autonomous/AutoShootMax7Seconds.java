@@ -14,7 +14,7 @@ import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Shooter.ShotDistance;
 import static frc.robot.Constants.*;
 
-public class AutoShootMax4Seconds extends CommandBase {
+public class AutoShootMax7Seconds extends CommandBase {
   /**
    * Creates a new ShooterCommand.
    */
@@ -26,7 +26,7 @@ public class AutoShootMax4Seconds extends CommandBase {
   private int m_conveyor_empty_count;
 
   
-  public AutoShootMax4Seconds(Shooter shooter, Intake intake, ShotDistance distance) {
+  public AutoShootMax7Seconds(Shooter shooter, Intake intake, ShotDistance distance) {
     // Use addRequirements() here to declare subsystem dependencies.
     m_shooter = shooter;
     m_intake = intake;
@@ -71,6 +71,6 @@ public class AutoShootMax4Seconds extends CommandBase {
   // Command will run until the button is released, or autonomous timer hits
   @Override
   public boolean isFinished() {
-    return ( (m_conveyor_empty_count >= 5) || cmdTimer.get() > 4);
+    return ( (m_conveyor_empty_count >= 50) || cmdTimer.get() > 7);
   }
 }
