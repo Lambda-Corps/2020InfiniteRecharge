@@ -78,7 +78,7 @@ public class ShuffleboardInfo {
             .withWidget(BuiltInWidgets.kBooleanBox)
             .getEntry();
 
-        m_driver_tab.add("Limelight", new HttpCamera("Limelight", "http://10.18.95.11:5800"))
+        m_driver_tab.add("Limelight", new HttpCamera("Limelight", "http://10.18.95.11:5800/stream.mjpg"))
             .withWidget(BuiltInWidgets.kCameraStream)
             .withPosition(4, 0)
             .withSize(3, 3);

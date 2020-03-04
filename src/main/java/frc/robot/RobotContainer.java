@@ -31,6 +31,7 @@ import frc.robot.commands.DefaultIntakeCommand;
 import frc.robot.commands.Drive_Backwards;
 import frc.robot.commands.EditTalonSpeeds;
 import frc.robot.commands.ExtendClimberSolenoid;
+import frc.robot.commands.HoldIntakeDown;
 import frc.robot.commands.IntakeCancel;
 import frc.robot.commands.RetractClimberSolenoid;
 import frc.robot.commands.Shoot;
@@ -118,11 +119,11 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     driver_RB = new JoystickButton(m_driver_controller, XboxController.Button.kBumperRight.value);
-    driver_RB.whenHeld(new Drive_Backwards(m_drive_train, m_driver_controller));
+    driver_RB.whileHeld(new Drive_Backwards(m_drive_train, m_driver_controller));
     driver_A = new JoystickButton(m_driver_controller, 1);
-    driver_A.whenHeld(new AlignWithVision(m_drive_train, m_vision));
+    driver_A.whileHeld(new AlignWithVision(m_drive_train, m_vision));
     driver_LB = new JoystickButton(m_driver_controller, XboxController.Button.kBumperLeft.value);
-    driver_LB.whenPressed(new ToggleIntake(m_intake));
+    driver_LB.whileHeld(new HoldIntakeDown(m_intake));
     driver_Start = new JoystickButton(m_driver_controller,XboxController.Button.kStart.value);
     driver_Start.whenPressed(new ClimberUp(m_climber));
     driver_Back = new JoystickButton(m_driver_controller,XboxController.Button.kBack.value);
