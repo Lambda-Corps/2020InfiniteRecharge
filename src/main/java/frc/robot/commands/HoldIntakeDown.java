@@ -13,7 +13,7 @@ import frc.robot.subsystems.Intake;
 public class HoldIntakeDown extends CommandBase {
   private final Intake m_Intake;
   private boolean m_IsDone;
-  private Intake.DeployState m_IntakeState;
+  
   /**
    * Creates a new HoldIntakeDown.
    */

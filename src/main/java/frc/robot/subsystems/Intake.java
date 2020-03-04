@@ -112,15 +112,19 @@ public class Intake extends SubsystemBase {
   }  
 
   public boolean pullInBalls(){
+    double conveyorspeed = CONVEYOR_SPEED;
     
-    conveyorMotor.set(ControlMode.PercentOutput, m_TopBeam.get() ? CONVEYOR_SPEED : 0.0);
-    // if( m_TopBeam.get() ){
-    //   SmartDashboard.putNumber("Beam True Count", count++);
-    //   conveyorMotor.set(ControlMode.PercentOutput, CONVEYOR_SPEED);
-    // }
-    // else{
-    //   conveyorMotor.set(ControlMode.PercentOutput, 0);
-    // }
+    // We want to only run the conveyor when necessary to create space in the 
+    // elevator. Otherwise keep it off to in order to manage the intake
+    // from the balls not working
+    // Off conditions:
+    if(!m_TopBeam.get() || (m_BottomBeam.get() && !m_MiddleTopBeam.get())){
+      conveyorspeed = 0;
+    } else if( m_TopBeam.get() && !m_MiddleTopBeam.get() && m_BottomBeam.get() ){
+      conveyorspeed = 0;
+    }
+
+    conveyorMotor.set(ControlMode.PercentOutput, conveyorspeed);
 
     // Count how many beam breakers are detecting balls.  If all four of 
     // them  are full, we should probably stop the intake motors from
@@ -146,10 +150,6 @@ public class Intake extends SubsystemBase {
       intakeMotor.set(ControlMode.PercentOutput, INTAKE_SPEED);
       indexer.set(ControlMode.PercentOutput, INDEXER_SPEED);
     } else{
-      return true;
-    }
-
-    if(!m_TopBeam.get()){
       return true;
     }
 

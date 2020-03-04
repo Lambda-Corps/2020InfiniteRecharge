@@ -32,7 +32,7 @@ public class Pos3_45 extends SequentialCommandGroup {
     addCommands(
       //new RotateToTarget(vision, driveTrain),
       new Shoot(shooter, intake, ShotDistance.InitiationLine).withTimeout(3),
-      new TurnMM(driveTrain, 45), //TODO find this angle
+      new TurnMM(driveTrain, 45),
       new ParallelCommandGroup(
         new DriveMM(driveTrain,-158.13),
         new AutoIntakeDown(intake, false)),
@@ -41,7 +41,7 @@ public class Pos3_45 extends SequentialCommandGroup {
         new DriveMM(driveTrain,158.13)),
       new TurnMM(driveTrain, -45), //find this angle
       new RotateToTarget(vision, driveTrain),
-      new AutoShootMax4Seconds(shooter, intake, ShotDistance.InitiationLine)
+      new AutoShootMax7Seconds(shooter, intake, ShotDistance.InitiationLine)
     );
   }
 }

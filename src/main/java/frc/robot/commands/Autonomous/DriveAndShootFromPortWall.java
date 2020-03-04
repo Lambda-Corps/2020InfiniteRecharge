@@ -26,7 +26,7 @@ public class DriveAndShootFromPortWall extends SequentialCommandGroup {
     // super(new FooCommand(), new BarCommand());
     addCommands(
       new DriveMM(driveTrain, 83.5).withTimeout(9), 
-      new AutoShootMax4Seconds(shooter, intake, ShotDistance.PortWall)
+      new AutoShootMax7Seconds(shooter, intake, ShotDistance.PortWall)
     );
   }
 }

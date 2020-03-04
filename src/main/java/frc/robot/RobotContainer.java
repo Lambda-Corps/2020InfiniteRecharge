@@ -7,7 +7,9 @@
 
 package frc.robot;
 
-import static frc.robot.Constants.*;
+import static frc.robot.Constants.DRIVER_REMOTE_PORT;
+import static frc.robot.Constants.PARTNER_REMOTE_PORT;
+import static frc.robot.Constants.VISION_LED_OFF;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
@@ -36,16 +38,14 @@ import frc.robot.commands.IntakeCancel;
 import frc.robot.commands.RetractClimberSolenoid;
 import frc.robot.commands.Shoot;
 import frc.robot.commands.ShooterCancel;
-import frc.robot.commands.ToggleIntake;
 import frc.robot.commands.TurnMM;
 import frc.robot.commands.TurnOffLImelightLEDs;
 import frc.robot.commands.TurnOnLimelightLEDs;
-import frc.robot.commands.Shifting.ToggleShifting;
 import frc.robot.commands.Shooter.SetShooterDistance;
-import frc.robot.commands.autonomous.DriveOffLine;
-import frc.robot.commands.autonomous.Pos1;
 import frc.robot.commands.autonomous.BackInitLineShoot3AndDrive;
 import frc.robot.commands.autonomous.DriveAndShootFromPortWall;
+import frc.robot.commands.autonomous.DriveOffLine;
+import frc.robot.commands.autonomous.Pos1;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.Intake;
@@ -210,7 +210,6 @@ public class RobotContainer {
     Shuffleboard.getTab("Talon Tuning").add(new EditTalonSpeeds(m_drive_train));
   }
 
-  @SuppressWarnings("unused")
   private void setupClimberShuffleBoard(){
     Shuffleboard.getTab("Climber").add("up",new ClimberUp(m_climber));
     Shuffleboard.getTab("Climber").add("down",new ClimberDown(m_climber));

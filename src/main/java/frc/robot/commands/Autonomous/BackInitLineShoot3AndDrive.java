@@ -25,7 +25,7 @@ public class BackInitLineShoot3AndDrive extends SequentialCommandGroup {
     // Add your commands in the super() call, e.g.
     // super(new FooCommand(), new BarCommand());
     addCommands(
-      new AutoShootMax4Seconds(shooter, intake, ShotDistance.InitiationLine),
+      new AutoShootMax7Seconds(shooter, intake, ShotDistance.InitiationLine),
       new DriveMM(driveTrain, -30)
     );
   }

@@ -27,7 +27,7 @@ public class Pos2_90 extends SequentialCommandGroup {
     // super(new FooCommand(), new BarCommand());
     addCommands(
       // new RotateToTarget(vision, driveTrain),
-      new AutoShootMax4Seconds(shooter, intake, ShotDistance.InitiationLine),
+      new AutoShootMax7Seconds(shooter, intake, ShotDistance.InitiationLine),
       new DriveMM(driveTrain, -30)
       // new TurnMM(driveTrain, 90),
       // new DriveMM(driveTrain, 58),

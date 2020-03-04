@@ -40,7 +40,7 @@ public class Pos1 extends SequentialCommandGroup {
       new DriveMM(driveTrain, 200), 
       new TurnMM(driveTrain, -90),
       new RotateToTarget(vision, driveTrain),//.withTimeout(.1),
-      new AutoShootMax4Seconds(shooter, intake, ShotDistance.InitiationLine)
+      new AutoShootMax7Seconds(shooter, intake, ShotDistance.InitiationLine)
     );
       
     
