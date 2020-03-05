@@ -47,6 +47,7 @@ import frc.robot.commands.autonomous.BackInitLineShoot3AndDrive;
 import frc.robot.commands.autonomous.DriveAndShootFromPortWall;
 import frc.robot.commands.autonomous.DriveOffLine;
 import frc.robot.commands.autonomous.Pos1;
+import frc.robot.commands.autonomous.Pos3_45;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.Intake;
@@ -73,9 +74,9 @@ public class RobotContainer {
   // The robot's operator interface functionality goes here
   private final XboxController m_driver_controller = new XboxController(DRIVER_REMOTE_PORT);
   private JoystickButton driver_RB, driver_A, /*driver_X, */driver_LB, driver_Start, driver_Back, driver_stick_left, driver_stick_right, driver_X;
-  private POVButton driver_POVright, driver_POVbottom; // driver_POVtop,, driver_POVleft; 
+  private POVButton driver_POVright, driver_POVbottom, driver_POVleft; // driver_POVtop,,  
   private final XboxController m_partner_controller = new XboxController(PARTNER_REMOTE_PORT);
-  private JoystickButton partner_Start, partner_Back, partner_B, partner_A; //partner_LB, partner_RB, partner_X, partner_Y, 
+  private JoystickButton partner_Start, partner_Back, partner_B, partner_A, partner_Y; //partner_LB, partner_RB, partner_X,  
   
   //private DefaultIntakeCommand m_dDefaultIntakeCommand;
   //private Intake m_Intake;
@@ -91,7 +92,7 @@ public class RobotContainer {
     m_auto_chooser.addOption("Front of Line, drive to wall", new DriveAndShootFromPortWall(m_drive_train, m_shooter, m_intake));
     // m_auto_chooser.addOption("Position 1 Auto", new Pos1(m_drive_train, m_vision, m_shooter, m_intake));
     // m_auto_chooser.addOption("Positon 2 Auto", new Pos2_90(m_drive_train, m_vision, m_shooter, m_intake));
-    //m_auto_chooser.addOption("Position 3 Auto", new Pos3_45(m_drive_train, m_vision, m_shooter, m_intake));
+    m_auto_chooser.addOption("Trench, 6 ball", new Pos3_45(m_drive_train, m_vision, m_shooter, m_intake));
     m_auto_chooser.addOption("Drive Off of the Initiation Line", new DriveOffLine(m_drive_train));
     
 
@@ -142,7 +143,8 @@ public class RobotContainer {
     driver_POVright.whenPressed(new SetShooterDistance(m_shooter, ShotDistance.InitiationLine));
     driver_POVbottom = new POVButton( m_driver_controller, 180);
     driver_POVbottom.whenPressed(new SetShooterDistance(m_shooter, ShotDistance.PortWall));
-    // driver_POVleft = new POVButton(m_driver_controller, 270);
+    driver_POVleft = new POVButton(m_driver_controller, 270);
+    driver_POVleft.whenPressed(new SetShooterDistance(m_shooter, ShotDistance.FrontTrench));
     
     //jb= joystick button
 
@@ -155,10 +157,10 @@ public class RobotContainer {
 
     // partner_X = new JoystickButton(m_partner_controller, XboxController.Button.kX.value);
     // partner_X.whenPressed(new );
-    // partner_Y = new JoystickButton(m_partner_controller, XboxController.Button.kY.value);
-    // partner_Y.whenPressed(new Shoot(m_shooter, m_intake, ShotDistance.FrontTrench));
+    partner_Y = new JoystickButton(m_partner_controller, XboxController.Button.kY.value);
+    partner_Y.whileHeld(new Shoot(m_shooter, m_intake, ShotDistance.FrontTrench));
     partner_B = new JoystickButton(m_partner_controller, XboxController.Button.kB.value);
-    partner_B.whenPressed(new Shoot(m_shooter, m_intake, ShotDistance.InitiationLine));
+    partner_B.whileHeld(new Shoot(m_shooter, m_intake, ShotDistance.InitiationLine));
     partner_A = new JoystickButton(m_partner_controller, XboxController.Button.kA.value);
     partner_A.whileHeld(new Shoot(m_shooter, m_intake, ShotDistance.PortWall));
     // partner_Start = new JoystickButton(m_partner_controller, XboxController.Button.kStart.value);
