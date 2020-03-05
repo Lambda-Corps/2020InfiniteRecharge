@@ -1,3 +1,4 @@
+
 /*----------------------------------------------------------------------------*/
 /* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
@@ -10,9 +11,8 @@ package frc.robot.commands.autonomous;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.DriveMM;
+import frc.robot.commands.RotateBackToOriginalHeading;
 import frc.robot.commands.RotateToTarget;
-import frc.robot.commands.Shoot;
-import frc.robot.commands.TurnMM;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
@@ -30,16 +30,18 @@ public class Pos3_45 extends SequentialCommandGroup {
     // Add your commands in the super() call, e.g.
     // super(new FooCommand(), new BarCommand());
     addCommands(
-      //new RotateToTarget(vision, driveTrain),
-      new Shoot(shooter, intake, ShotDistance.InitiationLine).withTimeout(3),
-      new TurnMM(driveTrain, 45),
+      new DriveMM(driveTrain, -61),
+      new RotateToTarget(vision, driveTrain),
+      new AutoShootMax7Seconds(shooter, intake, ShotDistance.FrontTrench),
+      new RotateBackToOriginalHeading(driveTrain),
       new ParallelCommandGroup(
-        new DriveMM(driveTrain,-158.13),
-        new AutoIntakeDown(intake, false)),
+        new DriveMM(driveTrain,-126), // TODO test this
+        new AutoIntakeDown(intake, true)
+      ),
       new ParallelCommandGroup(
         new AutoIntakeUp(intake),
-        new DriveMM(driveTrain,158.13)),
-      new TurnMM(driveTrain, -45), //find this angle
+        new DriveMM(driveTrain,126)// TODO test this
+      ), 
       new RotateToTarget(vision, driveTrain),
       new AutoShootMax7Seconds(shooter, intake, ShotDistance.InitiationLine)
     );

@@ -7,18 +7,19 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.networktables.NetworkTableEntry;
+import static frc.robot.Constants.MIN_TURN_OUTPUT;
+import static frc.robot.Constants.VISION_STEER_KP;
+import static frc.robot.Constants.VISION_TX_TOLOERANCE;
+
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.ShuffleboardInfo;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.Vision;
-import static frc.robot.Constants.*;
 public class RotateToTarget extends CommandBase {
 
   private final Vision m_vision;
   private final DriveTrain m_dt;
-  private double m_steeringKP;
-  private NetworkTableEntry m_steerKP;
+  private int m_stable_done;
+
   /**
    * Creates a new RotateToTTarget.
    */
@@ -27,14 +28,13 @@ public class RotateToTarget extends CommandBase {
     m_vision = vision;
     m_dt = driveTrain;
     addRequirements(vision, driveTrain);
-
-    m_steerKP = ShuffleboardInfo.getInstance().getKPsteerEntry();
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_steeringKP = m_steerKP.getDouble(0);
+    m_stable_done = 0;
+    m_dt.reset_gyro();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -45,13 +45,16 @@ public class RotateToTarget extends CommandBase {
     double tx = m_vision.getTX();
     if (tx < VISION_TX_TOLOERANCE && tx > -VISION_TX_TOLOERANCE) {
       right = 0;
-    
+      m_stable_done++;
     }else {
-      right = tx * m_steeringKP;
+      m_stable_done = 0;
+      right = tx * VISION_STEER_KP;
+      if (right > 0 && right < MIN_TURN_OUTPUT) {
+        right = MIN_TURN_OUTPUT;
+      } else if (right < 0 && right > -MIN_TURN_OUTPUT) {
+        right = -MIN_TURN_OUTPUT;
+      }
     }
-    // double right = m_vision.getTX()* m_steeringKP; 
-    // if (right < .15 && )
-    // // Right X
 
     m_dt.teleop_drive(0, right);
   }
@@ -59,11 +62,12 @@ public class RotateToTarget extends CommandBase {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
+    m_dt.set_last_heading();
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return m_stable_done >= 20;
   }
 }

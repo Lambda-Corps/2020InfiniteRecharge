@@ -122,7 +122,7 @@ public final class Constants {
     //shooter
     public static final int SHOOTER_SETPOINT_WALL = 7500;
     public static final int SHOOTER_SETPOINT_LINE = 12300;
-    public static final int SHOOTER_SETPOINT_TRENCH = 13000;
+    public static final int SHOOTER_SETPOINT_TRENCH = 14200;
     public static final double SHOOTER_RAMP_TIME = 1.0;
     public static final int RUNTIME = 5;
     // Each shooting distance may have different gains to make it work
@@ -132,21 +132,21 @@ public final class Constants {
     /*                                                           kp,  ki,  kd,  kf,   iz,  peak output*/
     public static final Gains kGains_InitiationLine = new Gains(1.6,  0, 0, .075, 100,  1.00);  // Calculated originally with 13000 as target rpm
     public static final Gains kGains_PortWall       = new Gains(.1023, 0,  0, 0.10,200, 1.00);
-    public static final Gains kGains_FrontTrench    = new Gains(1.6,  0, 0, .075, 300,  1.00);
+    public static final Gains kGains_FrontTrench    = new Gains(4,  0, 0, .038, 300,  1.00);
     public static final Value SHOOTER_WALL_SHOT = Value.kForward;
     public static final Value SHOOTER_FAR_SHOT = Value.kReverse;
 
    //Intake
-   public static double CONVEYOR_SPEED = .4;
-   public static double INTAKE_SPEED = -.7;
+   public static double CONVEYOR_SPEED = .5;
+   public static double INTAKE_SPEED = -.6;
    public static double INDEXER_SPEED = .7;  
    public static final Value INTAKE_UP_POSITION = Value.kForward;
    public static final Value INTAKE_DOWN_POSITION = Value.kReverse;
 
    // vision
-   public static final double VISION_TX_TOLOERANCE = 1;
+   public static final double VISION_TX_TOLOERANCE = .6;
    public static final int VISION_LED_OFF = 1;
    public static final int VISION_LED_PIPELINE = 0;
-
-
+   public static final double MIN_TURN_OUTPUT = 0.2;
+   public static final double VISION_STEER_KP = 0.048;
 }

@@ -150,6 +150,8 @@ public class Intake extends SubsystemBase {
       intakeMotor.set(ControlMode.PercentOutput, INTAKE_SPEED);
       indexer.set(ControlMode.PercentOutput, INDEXER_SPEED);
     } else{
+      // we're full
+      stopMotors();
       return true;
     }
 

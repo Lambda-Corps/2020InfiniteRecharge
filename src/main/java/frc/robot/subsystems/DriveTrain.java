@@ -15,6 +15,8 @@ import com.ctre.phoenix.motorcontrol.InvertType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+import edu.wpi.first.wpilibj.SPI;
+import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
@@ -38,7 +40,8 @@ public class DriveTrain extends SubsystemBase {
 
 
   private final NetworkTableEntry m_low_gear_entry;
-  //private final AHRS navx;
+  private double m_last_heading;
+  private final AHRS navx;
   /**
    * Creates a new DriveTrain.
    */
@@ -127,6 +130,8 @@ public class DriveTrain extends SubsystemBase {
     m_safety_drive = new DifferentialDrive(m_leftLeader, m_rightLeader);
 
     m_gearbox = new DoubleSolenoid(GEARBOX_SOLENOID_A, GEARBOX_SOLENOID_B);
+
+    navx = new AHRS(SPI.Port.kMXP);
   }
 
   private double normalize(double speed) {
@@ -400,7 +405,6 @@ public class DriveTrain extends SubsystemBase {
     }
   }
 
-  @SuppressWarnings("unused")
   public boolean isLowGear(){
     return (m_gearbox.get() == DT_LOW_GEAR);
   }
@@ -414,5 +418,17 @@ public class DriveTrain extends SubsystemBase {
   }
   public void feedWatchdog(){
     m_safety_drive.feed();
+  }
+
+  public double get_last_heading() {
+    return m_last_heading;
+  }
+
+  public void reset_gyro(){
+    navx.reset();
+  }
+
+  public void set_last_heading(){
+    m_last_heading = navx.getAngle();
   }
 }
