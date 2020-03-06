@@ -36,7 +36,6 @@ import frc.robot.commands.ExtendClimberSolenoid;
 import frc.robot.commands.HoldIntakeDown;
 import frc.robot.commands.IntakeCancel;
 import frc.robot.commands.RetractClimberSolenoid;
-import frc.robot.commands.RotateToTarget;
 import frc.robot.commands.Shoot;
 import frc.robot.commands.ShooterCancel;
 import frc.robot.commands.TurnMM;
@@ -51,9 +50,11 @@ import frc.robot.commands.autonomous.Pos3_45;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.Intake;
+
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Shooter.ShotDistance;
 import frc.robot.subsystems.Vision;
+
 /**
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
  * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
@@ -67,16 +68,17 @@ public class RobotContainer {
   private final Climber m_climber = new Climber();
   private final Intake m_intake = new Intake();
   private final Shooter m_shooter = new Shooter();
+ 
   //private final ColorWheel m_ColorWheel;
 
   // Shuffleboard Info is the container for all the shuffleboard pieces we want to see
   private ShuffleboardInfo m_sbi_instance;
   // The robot's operator interface functionality goes here
   private final XboxController m_driver_controller = new XboxController(DRIVER_REMOTE_PORT);
-  private JoystickButton driver_RB, driver_A, /*driver_X, */driver_LB, driver_Start, driver_Back, driver_stick_left, driver_stick_right, driver_X;
-  private POVButton driver_POVright, driver_POVbottom, driver_POVleft; // driver_POVtop,,  
+  private JoystickButton driver_RB, driver_A, /*driver_X, */driver_LB, driver_Start, driver_Back, driver_stick_left, driver_stick_right;
+  private POVButton driver_POVright, driver_POVbottom; // driver_POVtop,, driver_POVleft; 
   private final XboxController m_partner_controller = new XboxController(PARTNER_REMOTE_PORT);
-  private JoystickButton partner_Start, partner_Back, partner_B, partner_A, partner_Y; //partner_LB, partner_RB, partner_X,  
+  private JoystickButton partner_Start, partner_Back, partner_B, partner_A; //partner_LB, partner_RB, partner_X, partner_Y, 
   
   //private DefaultIntakeCommand m_dDefaultIntakeCommand;
   //private Intake m_Intake;
@@ -92,12 +94,14 @@ public class RobotContainer {
     m_auto_chooser.addOption("Front of Line, drive to wall", new DriveAndShootFromPortWall(m_drive_train, m_shooter, m_intake));
     // m_auto_chooser.addOption("Position 1 Auto", new Pos1(m_drive_train, m_vision, m_shooter, m_intake));
     // m_auto_chooser.addOption("Positon 2 Auto", new Pos2_90(m_drive_train, m_vision, m_shooter, m_intake));
-    m_auto_chooser.addOption("Trench, 6 ball", new Pos3_45(m_drive_train, m_vision, m_shooter, m_intake));
+    m_auto_chooser.addOption("Position 3 Auto", new Pos3_45(m_drive_train, m_vision, m_shooter, m_intake));
     m_auto_chooser.addOption("Drive Off of the Initiation Line", new DriveOffLine(m_drive_train));
     
 
     Shuffleboard.getTab("PID Tuning").add(new ShooterTuningCommand(m_shooter,m_intake)).withWidget(BuiltInWidgets.kCommand);
 
+    
+    
     // Set the default commands for the subsystems
     m_drive_train.setDefaultCommand(new DefaultDriveTrainCommand(m_drive_train, m_driver_controller));
     m_intake.setDefaultCommand(new DefaultIntakeCommand(m_intake, m_partner_controller));
@@ -124,8 +128,6 @@ public class RobotContainer {
     driver_RB.whileHeld(new Drive_Backwards(m_drive_train, m_driver_controller));
     driver_A = new JoystickButton(m_driver_controller, 1);
     driver_A.whileHeld(new AlignWithVision(m_drive_train, m_vision));
-    driver_X = new JoystickButton(m_driver_controller, XboxController.Button.kX.value);
-    driver_X.whileHeld(new RotateToTarget(m_vision, m_drive_train));
     driver_LB = new JoystickButton(m_driver_controller, XboxController.Button.kBumperLeft.value);
     driver_LB.whileHeld(new HoldIntakeDown(m_intake));
     driver_Start = new JoystickButton(m_driver_controller,XboxController.Button.kStart.value);
@@ -137,14 +139,13 @@ public class RobotContainer {
     driver_stick_right = new JoystickButton(m_driver_controller, XboxController.Button.kStickRight.value);
     driver_stick_right.whenPressed(new TurnOnLimelightLEDs(m_vision));
     // driver_r_jb = new JoystickButton( m_driver_controller, XboxController.Button.kStickRight.value);
-    // driver_POVtop = new POVButton(m_driver_controller, 0);
-    // driver_POVtop.whenPressed(new SetShooterDistance(m_shooter, ShotDistance.FrontTrench));
+    //driver_POVtop = new POVButton(m_driver_controller, 0);
+    //driver_POVtop.whenPressed(new SetShooterDistance(m_shooter, ShotDistance.FrontTrench));
     driver_POVright = new POVButton(m_driver_controller, 90);
     driver_POVright.whenPressed(new SetShooterDistance(m_shooter, ShotDistance.InitiationLine));
     driver_POVbottom = new POVButton( m_driver_controller, 180);
     driver_POVbottom.whenPressed(new SetShooterDistance(m_shooter, ShotDistance.PortWall));
-    driver_POVleft = new POVButton(m_driver_controller, 270);
-    driver_POVleft.whenPressed(new SetShooterDistance(m_shooter, ShotDistance.FrontTrench));
+    driver_POVbottom = new POVButton(m_driver_controller, 270);
     
     //jb= joystick button
 
@@ -157,10 +158,10 @@ public class RobotContainer {
 
     // partner_X = new JoystickButton(m_partner_controller, XboxController.Button.kX.value);
     // partner_X.whenPressed(new );
-    partner_Y = new JoystickButton(m_partner_controller, XboxController.Button.kY.value);
-    partner_Y.whileHeld(new Shoot(m_shooter, m_intake, ShotDistance.FrontTrench));
+    // partner_Y = new JoystickButton(m_partner_controller, XboxController.Button.kY.value);
+    // partner_Y.whenPressed(new Shoot(m_shooter, m_intake, ShotDistance.FrontTrench));
     partner_B = new JoystickButton(m_partner_controller, XboxController.Button.kB.value);
-    partner_B.whileHeld(new Shoot(m_shooter, m_intake, ShotDistance.InitiationLine));
+    partner_B.whenPressed(new Shoot(m_shooter, m_intake, ShotDistance.InitiationLine));
     partner_A = new JoystickButton(m_partner_controller, XboxController.Button.kA.value);
     partner_A.whileHeld(new Shoot(m_shooter, m_intake, ShotDistance.PortWall));
     // partner_Start = new JoystickButton(m_partner_controller, XboxController.Button.kStart.value);

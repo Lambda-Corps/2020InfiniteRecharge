@@ -30,20 +30,20 @@ public class Pos3_45 extends SequentialCommandGroup {
     // Add your commands in the super() call, e.g.
     // super(new FooCommand(), new BarCommand());
     addCommands(
-      new DriveMM(driveTrain, -61),
-      new RotateToTarget(vision, driveTrain),
+      new DriveMM(driveTrain, -54),
+      new RotateToTarget(vision, driveTrain).withTimeout(0.75),
       new AutoShootMax7Seconds(shooter, intake, ShotDistance.FrontTrench),
-      new RotateBackToOriginalHeading(driveTrain),
+      new RotateBackToOriginalHeading(driveTrain).withTimeout(0.75),
       new ParallelCommandGroup(
-        new DriveMM(driveTrain,-126), // TODO test this
+        new DriveMM(driveTrain,-105), // TODO test this
         new AutoIntakeDown(intake, true)
-      ),
+      ).withTimeout(5),
       new ParallelCommandGroup(
         new AutoIntakeUp(intake),
-        new DriveMM(driveTrain,126)// TODO test this
+        new DriveMM(driveTrain,105)// TODO test this
       ), 
-      new RotateToTarget(vision, driveTrain),
-      new AutoShootMax7Seconds(shooter, intake, ShotDistance.InitiationLine)
+      new RotateToTarget(vision, driveTrain).withTimeout(0.75),
+      new AutoShootMax7Seconds(shooter, intake, ShotDistance.FrontTrench)
     );
   }
 }
