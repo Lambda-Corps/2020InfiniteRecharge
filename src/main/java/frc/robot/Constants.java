@@ -114,7 +114,7 @@ public final class Constants {
     public static final double SPINNING_TO_A_COLOR = 0.5;
 
     // Climber Constants
-    public static final double CLIMBER_UP_SPEED = 1.0;
+    public static final double CLIMBER_UP_SPEED = 0.5;
     public static final double CLIMBER_DOWN_SPEED = -1.0;
     public static final double CLIMBER_RAMP_RATE = 1.5;
     public static final int    CLIMBER_CURRENT_LIMIT = 25;
@@ -122,7 +122,7 @@ public final class Constants {
     //shooter
     public static final int SHOOTER_SETPOINT_WALL = 7500;
     public static final int SHOOTER_SETPOINT_LINE = 11850;
-    public static final int SHOOTER_SETPOINT_TRENCH = 13750;
+    public static final int SHOOTER_SETPOINT_TRENCH = 14000;
     public static final double SHOOTER_RAMP_TIME = 1.0;
     public static final int RUNTIME = 5;
     // Each shooting distance may have different gains to make it work
@@ -138,7 +138,7 @@ public final class Constants {
 
    //Intake
    public static double CONVEYOR_SPEED = .5;
-   public static double INTAKE_SPEED = -.6;
+   public static double INTAKE_SPEED = -.65;
    public static double INDEXER_SPEED = .7;  
    public static final Value INTAKE_UP_POSITION = Value.kForward;
    public static final Value INTAKE_DOWN_POSITION = Value.kReverse;
@@ -148,5 +148,5 @@ public final class Constants {
    public static final int VISION_LED_OFF = 1;
    public static final int VISION_LED_PIPELINE = 0;
    public static final double MIN_TURN_OUTPUT = 0.2;
-   public static final double VISION_STEER_KP = 0.048;
+   public static final double VISION_STEER_KP = 0.3;
 }

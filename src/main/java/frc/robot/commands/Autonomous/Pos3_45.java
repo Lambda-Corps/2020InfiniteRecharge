@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.DriveMM;
 import frc.robot.commands.RotateBackToOriginalHeading;
 import frc.robot.commands.RotateToTarget;
+import frc.robot.commands.TurnOnLimelightLEDs;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
@@ -31,6 +32,7 @@ public class Pos3_45 extends SequentialCommandGroup {
     // super(new FooCommand(), new BarCommand());
     addCommands(
       new DriveMM(driveTrain, -54),
+      new TurnOnLimelightLEDs(vision),
       new RotateToTarget(vision, driveTrain).withTimeout(0.75),
       new AutoShootMax7Seconds(shooter, intake, ShotDistance.FrontTrench),
       new RotateBackToOriginalHeading(driveTrain).withTimeout(0.75),

@@ -35,7 +35,9 @@ import frc.robot.commands.EditTalonSpeeds;
 import frc.robot.commands.ExtendClimberSolenoid;
 import frc.robot.commands.HoldIntakeDown;
 import frc.robot.commands.IntakeCancel;
+import frc.robot.commands.MiddleClimbCommand;
 import frc.robot.commands.RetractClimberSolenoid;
+import frc.robot.commands.RotateToTarget;
 import frc.robot.commands.Shoot;
 import frc.robot.commands.ShooterCancel;
 import frc.robot.commands.TurnMM;
@@ -75,10 +77,10 @@ public class RobotContainer {
   private ShuffleboardInfo m_sbi_instance;
   // The robot's operator interface functionality goes here
   private final XboxController m_driver_controller = new XboxController(DRIVER_REMOTE_PORT);
-  private JoystickButton driver_RB, driver_A, /*driver_X, */driver_LB, driver_Start, driver_Back, driver_stick_left, driver_stick_right;
+  private JoystickButton driver_RB, driver_A, /*driver_X, */driver_LB, driver_Start, driver_Back, driver_stick_left, driver_stick_right, driver_Y, driver_X;
   private POVButton driver_POVright, driver_POVbottom; // driver_POVtop,, driver_POVleft; 
   private final XboxController m_partner_controller = new XboxController(PARTNER_REMOTE_PORT);
-  private JoystickButton partner_Start, partner_Back, partner_B, partner_A; //partner_LB, partner_RB, partner_X, partner_Y, 
+  private JoystickButton partner_Start, partner_Back, partner_B, partner_A, partner_Y; //partner_LB, partner_RB, partner_X, , 
   
   //private DefaultIntakeCommand m_dDefaultIntakeCommand;
   //private Intake m_Intake;
@@ -138,6 +140,10 @@ public class RobotContainer {
     driver_stick_left.whenPressed(new TurnOffLImelightLEDs(m_vision));
     driver_stick_right = new JoystickButton(m_driver_controller, XboxController.Button.kStickRight.value);
     driver_stick_right.whenPressed(new TurnOnLimelightLEDs(m_vision));
+    driver_Y =new JoystickButton(m_driver_controller, XboxController.Button.kY.value);
+    driver_Y.whenPressed(new MiddleClimbCommand(m_climber));
+    driver_X = new JoystickButton(m_driver_controller, XboxController.Button.kX.value);
+    driver_X.whileHeld(new RotateToTarget(m_vision, m_drive_train));
     // driver_r_jb = new JoystickButton( m_driver_controller, XboxController.Button.kStickRight.value);
     //driver_POVtop = new POVButton(m_driver_controller, 0);
     //driver_POVtop.whenPressed(new SetShooterDistance(m_shooter, ShotDistance.FrontTrench));
@@ -158,8 +164,8 @@ public class RobotContainer {
 
     // partner_X = new JoystickButton(m_partner_controller, XboxController.Button.kX.value);
     // partner_X.whenPressed(new );
-    // partner_Y = new JoystickButton(m_partner_controller, XboxController.Button.kY.value);
-    // partner_Y.whenPressed(new Shoot(m_shooter, m_intake, ShotDistance.FrontTrench));
+    partner_Y = new JoystickButton(m_partner_controller, XboxController.Button.kY.value);
+    partner_Y.whenPressed(new Shoot(m_shooter, m_intake, ShotDistance.FrontTrench));
     partner_B = new JoystickButton(m_partner_controller, XboxController.Button.kB.value);
     partner_B.whenPressed(new Shoot(m_shooter, m_intake, ShotDistance.InitiationLine));
     partner_A = new JoystickButton(m_partner_controller, XboxController.Button.kA.value);
